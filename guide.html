@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Install Quick Skins — Disc Golf Skins Calculator</title>
+  <meta name="description" content="Get Quick Skins on your phone's home screen in under a minute, then learn how to turn a UDisc export into instant skins payouts. Free, no sign-up, no App Store.">
+  <link rel="canonical" href="https://skins.spiris.app/guide.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Quick Skins">
+  <meta property="og:title" content="Install Quick Skins — Disc Golf Skins Calculator">
+  <meta property="og:description" content="Get Quick Skins on your phone's home screen in under a minute, then learn how to turn a UDisc export into instant skins payouts. Free, no sign-up, no App Store.">
+  <meta property="og:url" content="https://skins.spiris.app/guide.html">
+  <meta property="og:image" content="https://skins.spiris.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Quick Skins app showing a disc golf skins breakdown and hole-by-hole results next to the tagline: instant disc golf skins payouts from your UDisc round.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Install Quick Skins — Disc Golf Skins Calculator">
+  <meta name="twitter:description" content="Get Quick Skins on your phone's home screen in under a minute, then learn how to turn a UDisc export into instant skins payouts.">
+  <meta name="twitter:image" content="https://skins.spiris.app/assets/og-image.png">
+  <meta name="theme-color" content="#664991">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Quick Skins">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23664991'/%3E%3Ctext x='16' y='22' font-size='18' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'%3E%24%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "FAQPage",
+        "@id": "https://skins.spiris.app/guide.html#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is Quick Skins a real app? Do I need the App Store?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No store needed. Quick Skins is a website that installs like an app (a PWA). Add it to your home screen once and it opens full-screen, just like any other app icon."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it work without service on the course?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Once you've installed it and opened it at least once, it keeps working offline."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is it free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes — no sign-up, no subscription."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Seriously with the Venmo and Cashapp?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes — no referral link or anything."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "VideoObject",
+        "name": "Export a round from UDisc",
+        "description": "How to export a finished disc golf round from UDisc as a CSV, starting from the scorecard.",
+        "contentUrl": "https://skins.spiris.app/assets/udisc-export.mp4",
+        "thumbnailUrl": "https://skins.spiris.app/assets/four-players.jpg",
+        "uploadDate": "2026-07-01"
+      },
+      {
+        "@type": "VideoObject",
+        "name": "Send a UDisc export to Quick Skins",
+        "description": "Opening the exported UDisc round in Quick Skins so the app can read the player and hole scores.",
+        "contentUrl": "https://skins.spiris.app/assets/quick-skins-udisc-export.mp4",
+        "thumbnailUrl": "https://skins.spiris.app/assets/skins-per-hole.jpg",
+        "uploadDate": "2026-07-01"
+      },
+      {
+        "@type": "VideoObject",
+        "name": "Get the skins breakdown in Quick Skins",
+        "description": "Quick Skins turns an imported round into skins, carries, and payouts while the group is still at the course.",
+        "contentUrl": "https://skins.spiris.app/assets/in-app-use.mp4",
+        "thumbnailUrl": "https://skins.spiris.app/assets/hard-math.jpg",
+        "uploadDate": "2026-07-01"
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --orange: #664991;
+      --orange-dark: #482669;
+      --ink: #261337;
+      --muted: #6E6478;
+      --line: #D3CDDC;
+      --surface: #F8F7F2;
+      --surface-strong: #E8E4EF;
+      --white: #ffffff;
+      --green: #15803d;
+      --gold: #E8A623;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-strong: 0 8px 24px rgba(38, 19, 55, 0.12);
+      --radius: 14px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      color: var(--ink);
+      background: var(--surface);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body { min-width: 320px; margin: 0; }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    a { color: var(--orange-dark); }
+
+    button { font: inherit; cursor: pointer; }
+
+    .wrap {
+      width: min(100%, 640px);
+      margin: 0 auto;
+      padding: 28px 18px calc(48px + var(--safe-bottom));
+    }
+
+    /* --- Hero --- */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      padding: 8px 0 30px;
+    }
+    .hero img {
+      width: 68px;
+      height: 68px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-strong);
+      margin-bottom: 4px;
+    }
+    .eyebrow {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .hero h1 {
+      font-size: clamp(1.9rem, 8vw, 2.5rem);
+      line-height: 1.08;
+    }
+    .hero .lead {
+      max-width: 46ch;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    /* --- Cards / sections --- */
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 4px;
+      font-size: 1.3rem;
+      line-height: 1.2;
+    }
+    .section-sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    /* --- Install CTA card --- */
+    .install-card {
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--orange);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow-strong);
+      padding: 22px 20px;
+      margin-bottom: 22px;
+    }
+    .install-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      border-radius: 999px;
+      background: var(--surface-strong);
+      color: var(--orange-dark);
+      padding: 4px 12px;
+      font-size: 0.74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .install-status.is-ready { background: rgba(21, 128, 61, 0.12); color: var(--green); }
+
+    .big-install-btn {
+      display: block;
+      width: 100%;
+      min-height: 56px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--orange);
+      color: var(--white);
+      font-size: 1.05rem;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+      margin: 14px 0 4px;
+    }
+    .big-install-btn:active { background: var(--orange-dark); }
+    .install-hint {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    /* --- Platform tabs --- */
+    .platform-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .platform-tab {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      padding: 0 6px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      position: relative;
+    }
+    .platform-tab.is-active {
+      border-color: var(--orange);
+      background: var(--orange);
+      color: var(--white);
+    }
+    .platform-tab .badge {
+      position: absolute;
+      top: -9px;
+      right: 4px;
+      background: var(--gold);
+      color: var(--ink);
+      border-radius: 999px;
+      font-size: 0.6rem;
+      font-weight: 900;
+      padding: 2px 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .steps {
+      display: none;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+    .steps.is-visible { display: grid; gap: 10px; }
+    .steps li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      font-size: 0.94rem;
+      line-height: 1.45;
+    }
+    .steps li::before {
+      content: counter(step);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--surface-strong);
+      color: var(--orange-dark);
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+    .steps kbd {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      padding: 1px 6px;
+      font: inherit;
+      font-size: 0.86em;
+      font-weight: 800;
+    }
+    .steps-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+
+    .already-installed {
+      display: none;
+      text-align: center;
+      padding: 6px 0 2px;
+    }
+    .already-installed.is-visible { display: block; }
+    .already-installed p { color: var(--muted); font-size: 0.92rem; margin-bottom: 12px; }
+
+    /* --- How it works --- */
+    .how-steps { display: grid; gap: 14px; }
+    .how-step {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .how-step .num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(102, 73, 145, 0.1);
+      color: var(--orange-dark);
+      font-weight: 900;
+      font-size: 1.05rem;
+    }
+    .how-step h3 { margin-bottom: 4px; font-size: 1rem; }
+    .how-step p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin: 0; }
+
+    /* --- Screenshots --- */
+    .shots-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .shot {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .shot img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+    .shot figcaption {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    /* Lead figure: import options walkthrough beside its screenshot.
+       Side-by-side on wide screens, stacked on phones so the text
+       never gets squeezed into a sliver. */
+    .import-figure {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 0 0 16px;
+    }
+    .import-figure figcaption {
+      flex: 1;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .import-figure img {
+      flex: 0 0 66%;
+      min-width: 0;
+      max-width: 66%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 540px) {
+      .import-figure { flex-direction: column; }
+      .import-figure img { flex-basis: auto; max-width: 100%; }
+    }
+
+    /* --- Step videos --- */
+    .step-video {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #160c20;
+      overflow: hidden;
+    }
+    .step-video video {
+      display: block;
+      width: 100%;
+      max-height: min(60vh, 480px);
+      background: #160c20;
+      object-fit: contain;
+    }
+
+    /* --- FAQ --- */
+    .faq-item { border-bottom: 1px solid var(--line); padding: 14px 0; }
+    .faq-item:last-child { border-bottom: 0; padding-bottom: 0; }
+    .faq-item h3 { font-size: 0.96rem; margin-bottom: 6px; }
+    .faq-item p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin: 0; }
+
+    /* --- Footer CTA --- */
+    .footer-cta {
+      text-align: center;
+      padding-top: 6px;
+    }
+    .open-app-link {
+      display: inline-block;
+      min-height: 52px;
+      line-height: 52px;
+      border-radius: 10px;
+      background: var(--ink);
+      color: var(--white);
+      text-decoration: none;
+      padding: 0 26px;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .footer-note a { color: var(--muted); text-decoration: underline; }
+
+    #toastHost {
+      position: fixed;
+      z-index: 60;
+      left: 50%;
+      bottom: calc(20px + var(--safe-bottom));
+      transform: translateX(-50%);
+      display: grid;
+      gap: 8px;
+      width: min(92%, 420px);
+      pointer-events: none;
+    }
+    .toast {
+      border-radius: var(--radius);
+      background: var(--ink);
+      color: var(--white);
+      padding: 12px 14px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      box-shadow: var(--shadow-strong);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <img src="assets/icon-192.png" alt="" width="68" height="68">
+      <p class="eyebrow">Disc golf skins, made quick</p>
+      <h1>Get Quick Skins on your phone</h1>
+      <p class="lead">Install it once like a real app — no App Store, no account — then import a UDisc round to see instant skins payouts on the course.</p>
+    </header>
+
+    <section class="install-card" id="installCard" aria-labelledby="installHeading">
+      <span class="install-status" id="installStatus">Step 1 &middot; Install</span>
+      <h2 class="section-title" id="installHeading">Add Quick Skins to your home screen - <br> </h2>
+      <h3> and have your cash figured out within 15 seconds.</h3>
+      <p class="section-sub" style="margin-bottom:14px;">Pick your device. </p>
+
+      <div class="platform-tabs" role="tablist" aria-label="Choose your device">
+        <button class="platform-tab" type="button" data-platform="ios" role="tab">iPhone &amp; iPad</button>
+        <button class="platform-tab" type="button" data-platform="android" role="tab">Android</button>
+        <button class="platform-tab" type="button" data-platform="desktop" role="tab">Desktop</button>
+      </div>
+
+      <ol class="steps" data-steps="ios">
+        <li>Open this page in <strong>Safari</strong> (Add to Home Screen only works from Safari, not Chrome, on iOS).</li>
+        <li>Tap the <strong>Share</strong> icon <kbd>⬆️□</kbd> in the toolbar.</li>
+        <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
+        <li>Tap <strong>Add</strong> in the top-right corner.</li>
+      </ol>
+
+      <ol class="steps" data-steps="android">
+        <li>Open this page in <strong>Chrome</strong>.</li>
+        <li>Tap the <strong>⋮</strong> menu in the top-right corner.</li>
+        <li>Tap <strong>Install app</strong> (or <strong>Add to Home screen</strong>).</li>
+        <li>Confirm by tapping <strong>Install</strong>.</li>
+      </ol>
+
+      <ol class="steps" data-steps="desktop">
+        <li>Look for the install icon <strong>⊕</strong> at the right edge of the address bar.</li>
+        <li>Click it, then click <strong>Install</strong>.</li>
+        <li>Quick Skins opens in its own window, separate from your browser tabs.</li>
+      </ol>
+
+      <button class="big-install-btn" type="button" id="installBtn">Install Quick Skins</button>
+      <p class="install-hint" id="installHint">Tap the button — your browser will handle the rest. On iPhone/iPad, follow the Safari steps above instead.</p>
+
+      <div class="already-installed" id="alreadyInstalled">
+        <p>Looks like you're already using the installed app. Nice — no extra steps needed.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Quick Skins works in 3 steps</h2><br>
+      <div class="how-steps">
+        <div class="how-step">
+          <span class="num">1</span>
+          <div>
+            <h3>Finish your round in UDisc</h3>
+            <p>Click on the Round Menu (top right) and select Export to CSV. </p>
+            <div class="step-video">
+              <video controls playsinline preload="metadata" aria-label="UDisc export clip">
+                <source src="assets/udisc-export.mp4" type="video/mp4">
+                Your browser does not support embedded video.
+              </video>
+            </div>
+          </div>
+        </div><br>
+        <div class="how-step">
+          <span class="num">2</span>
+          <div>
+            <h3>Share it to Quick Skins</h3>
+            <p>For most phones, share directly from UDisc to Quick Skins.</p> 
+	    <p>Otherwise you can save the file for in-app upload.</p>
+            <div class="step-video">
+              <video controls playsinline preload="metadata" aria-label="Quick Skins UDisc export handoff clip">
+                <source src="assets/quick-skins-udisc-export.mp4" type="video/mp4">
+                Your browser does not support embedded video.
+              </video>
+            </div>
+          </div>
+        </div><br>
+        <div class="how-step">
+          <span class="num">3</span>
+          <div>
+            <h3>Get instant payouts</h3>
+            <p>Immediately get a breakdown for who won how many skins.</p>
+	    <p>Review hole by hole breakdowns or skip ahead to payouts.</p>
+            <div class="step-video">
+              <video controls playsinline preload="metadata" aria-label="Quick Skins in-app walkthrough clip">
+                <source src="assets/in-app-use.mp4" type="video/mp4">
+                Your browser does not support embedded video.
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="shotsHeading">
+      <h2 class="section-title" id="shotsHeading">Under the hood</h2>
+      <br>
+
+	<figure class="import-figure">
+		<figcaption>
+			If you didn't or weren't able to share directly from UDisc to Quick Skins there are other options.<br><br>
+			Accessing the UDisc Round Menu and selecting Export to CSV also allows for saving of the score card.<br><br>
+			Save the .csv file on your phone to your downloads or any other easy to access folder.<br><br>
+			Use Quick Skins file locator (Tap to choose...) to select the score card you just saved.<br><br>
+			Otherwise somehow type in or copy/paste the round details. Good luck with that.
+		</figcaption>
+		<img src="assets/import-options.jpg" alt="Quick Skins import screen with a tap-to-choose file picker for the UDisc CSV and a paste-the-CSV text box as a fallback" width="1440" height="2931" loading="lazy" decoding="async">
+	</figure>
+
+
+	<div class="shots-grid">
+        <figure class="shot">
+          <img src="assets/four-players.jpg" alt="Quick Skins breakdown with all four players from the UDisc scorecard in the skins game" width="1440" height="2913" loading="lazy" decoding="async">
+          <figcaption>Everyone on the UDisc scorecard comes in automatically&hellip;</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/three-players.jpg" alt="The same round with one player marked as sitting out and the skins instantly recalculated for three players" width="1440" height="2913" loading="lazy" decoding="async">
+          <figcaption>&hellip;and anyone who sat out of skins is one tap to remove — everything recalculates instantly.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/skins-per-hole.jpg" alt="Quick Skins breakdown screen showing skins won per player and color-coded hole-by-hole results, including a push on hole 2" width="1440" height="2913" loading="lazy" decoding="async">
+          <figcaption>The results of each hole are listed out for optional review.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/hard-math.jpg" alt="Quick Skins payouts screen showing per-player winnings and recommended peer-to-peer payments, with Venmo and Cash App buttons" width="1440" height="5327" loading="lazy" decoding="async">
+          <figcaption>Payouts handle the hard math — even a five-player game settles in the fewest possible transfers.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Questions</h2>
+      <div class="faq-item">
+        <h3>Is this a real app? Do I need the App Store?</h3>
+        <p>No store needed. Quick Skins is a website that installs like an app (a "PWA"). Add it to your home screen once and it opens full-screen, just like any other app icon.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does it work without service on the course?</h3>
+        <p>Once you've installed it and opened it at least once, it keeps working offline.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Is it free?</h3>
+        <p>Yes — no sign-up, no subscription.</p>
+      </div> 
+      <div class="faq-item">
+        <h3>Seriously with the Venmo and Cashapp?</h3>
+        <p>Yes — no referral link or anything.</p>
+      </div>
+    </section>
+
+    <section class="footer-cta">
+      <a class="open-app-link" href="https://skins.spiris.app/">Open Quick Skins</a>
+      <p class="footer-note">Already have it installed? Open the app icon from your home screen instead.</p>
+      <p class="footer-note">Made by <a href="https://spiris.app/">Spiris</a> &middot; <a href="https://github.com/flyingturban/quickskins">Source on GitHub</a> &middot; Running league night? Try <a href="https://disc.spiris.app/">Doubles Night</a>.</p>
+    </section>
+  </div>
+
+  <div id="toastHost" aria-live="assertive"></div>
+
+  <script>
+    "use strict";
+
+    let deferredInstallPrompt = null;
+
+    function toast(msg) {
+      const host = document.getElementById("toastHost");
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = msg;
+      host.appendChild(el);
+      setTimeout(() => el.remove(), 3600);
+    }
+
+    function isStandaloneApp() {
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    function detectPlatform() {
+      const ua = navigator.userAgent || "";
+      const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      if (isIOS) return "ios";
+      if (/Android/.test(ua)) return "android";
+      return "desktop";
+    }
+
+    function selectPlatform(platform) {
+      document.querySelectorAll(".platform-tab").forEach(tab => {
+        tab.classList.toggle("is-active", tab.dataset.platform === platform);
+      });
+      document.querySelectorAll(".steps").forEach(list => {
+        list.classList.toggle("is-visible", list.dataset.steps === platform);
+      });
+    }
+
+    function setupTabs() {
+      const detected = detectPlatform();
+      selectPlatform(detected);
+
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = "You";
+      const activeTab = document.querySelector(`.platform-tab[data-platform="${detected}"]`);
+      if (activeTab) activeTab.appendChild(badge);
+
+      document.querySelectorAll(".platform-tab").forEach(tab => {
+        tab.addEventListener("click", () => selectPlatform(tab.dataset.platform));
+      });
+    }
+
+    function setupInstallCard() {
+      if (isStandaloneApp()) {
+        document.getElementById("installStatus").textContent = "Already installed";
+        document.getElementById("installStatus").classList.add("is-ready");
+        document.getElementById("alreadyInstalled").classList.add("is-visible");
+        document.getElementById("installBtn").style.display = "none";
+        document.getElementById("installHint").style.display = "none";
+        document.querySelector(".platform-tabs").style.display = "none";
+        document.querySelectorAll(".steps").forEach(s => s.style.display = "none");
+        return;
+      }
+      setupTabs();
+    }
+
+    document.getElementById("installBtn").addEventListener("click", async () => {
+      if (!deferredInstallPrompt) {
+        toast("Follow the steps above for your device to install.");
+        return;
+      }
+      const promptEvent = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      try {
+        await promptEvent.prompt();
+        const choice = await promptEvent.userChoice.catch(() => null);
+        if (choice && choice.outcome === "accepted") toast("Installing Quick Skins.");
+        else toast("Install dismissed — you can try again anytime.");
+      } catch (e) {
+        toast("Follow the steps above for your device to install.");
+      }
+    });
+
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      document.getElementById("installHint").textContent = "Tap the button above to install — your browser will prompt you directly.";
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      toast("Quick Skins installed. Find it on your home screen.");
+      setupInstallCard();
+    });
+
+    setupInstallCard();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

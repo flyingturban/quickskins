@@ -1,0 +1,11 @@
+# Editor / OS cruft
+.DS_Store
+Thumbs.db
+.~lock.*#
+
+# Local tooling (not part of the deployed site)
+.claude/
+
+# Example UDisc exports used for testing — keep skins data out of the repo/deploy
+*.csv
+samples/

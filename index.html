@@ -1,0 +1,2488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Quick Skins — Disc Golf Skins Calculator</title>
+  <meta name="description" content="After your round of skins, drop in your UDisc export and get instant payouts: who won each hole, how pushes carried, and what everyone owes. Free, no sign-up, works on your phone.">
+  <link rel="canonical" href="https://skins.spiris.app/">
+  <!-- Site not yet verified with Google Search Console. To verify: GSC > Settings >
+       Ownership verification > HTML tag, then add the meta tag it gives you here.
+       (Bing is already verified via /BingSiteAuth.xml.) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Quick Skins">
+  <meta property="og:title" content="Quick Skins — Disc Golf Skins Calculator">
+  <meta property="og:description" content="Drop in your UDisc export and get instant skins payouts: who won each hole, how pushes carried, and what everyone owes. Free, no sign-up.">
+  <meta property="og:url" content="https://skins.spiris.app/">
+  <meta property="og:image" content="https://skins.spiris.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Quick Skins app showing a disc golf skins breakdown and hole-by-hole results next to the tagline: instant disc golf skins payouts from your UDisc round.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Quick Skins — Disc Golf Skins Calculator">
+  <meta name="twitter:description" content="Drop in your UDisc export and get instant skins payouts: who won each hole, how pushes carried, and what everyone owes. Free, no sign-up.">
+  <meta name="twitter:image" content="https://skins.spiris.app/assets/og-image.png">
+  <meta name="theme-color" content="#664991">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Quick Skins">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23664991'/%3E%3Ctext x='16' y='22' font-size='18' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'%3E%24%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Quick Skins",
+    "url": "https://skins.spiris.app/",
+    "description": "Free disc golf skins calculator. Import a UDisc scorecard export and get instant skins payouts: who won each hole, how carries and pushes stacked up, and the fewest peer-to-peer payments to settle. Everything runs on-device; nothing is uploaded.",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "image": "https://skins.spiris.app/assets/og-image.png",
+    "screenshot": [
+      "https://skins.spiris.app/assets/four-players.jpg",
+      "https://skins.spiris.app/assets/skins-per-hole.jpg",
+      "https://skins.spiris.app/assets/hard-math.jpg"
+    ],
+    "featureList": [
+      "Import rounds from UDisc CSV exports",
+      "Automatic skins scoring with carries and pushes",
+      "Remove players who sat out and recalculate instantly",
+      "Buy-ins, payouts, and fewest-transfer settlement suggestions",
+      "Share payouts as a picture plus a link that reopens the full round",
+      "Installable PWA that works offline on the course"
+    ],
+    "publisher": { "@type": "Organization", "name": "Spiris" }
+  }
+  </script>
+
+  <style>
+    /* Design tokens reused from Doubles Night so the two apps share a look.
+       (--orange / --orange-dark are the brand purple; names kept for parity.) */
+    :root {
+      --orange: #664991;
+      --orange-dark: #482669;
+      --ink: #261337;
+      --muted: #6E6478;
+      --line: #D3CDDC;
+      --surface: #F8F7F2;
+      --surface-strong: #E8E4EF;
+      --white: #ffffff;
+      --green: #15803d;
+      --green-soft: rgba(22, 163, 74, 0.14);
+      --gold: #E8A623;
+      --gold-soft: rgba(232, 166, 35, 0.16);
+      --red: #b91c1c;
+      --red-soft: #fee2e2;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-strong: 0 8px 24px rgba(38, 19, 55, 0.12);
+      --radius: 12px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --phase-nav-height: 66px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      color: var(--ink);
+      background: var(--white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body { min-width: 320px; margin: 0; background: var(--white); }
+
+    button, input, select, textarea { font: inherit; }
+
+    button { min-height: 44px; border: 0; cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: 0.5; }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    .app-shell {
+      width: min(100%, 760px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 16px 16px calc(210px + var(--safe-bottom));
+    }
+
+    .app-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 4px 0 18px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    h1 {
+      margin-bottom: 0;
+      font-size: clamp(1.7rem, 7vw, 2.4rem);
+      line-height: 1.05;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .install-button {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--orange-dark);
+      padding: 0 11px;
+      font-size: 0.76rem;
+      font-weight: 900;
+      white-space: nowrap;
+      box-shadow: var(--shadow);
+    }
+
+    .install-help-link {
+      display: inline-block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-decoration: underline;
+    }
+
+    h2 { margin-bottom: 12px; font-size: 1.05rem; line-height: 1.2; }
+    h3 { margin-bottom: 10px; font-size: 0.95rem; }
+
+    time {
+      display: block;
+      max-width: 132px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.25;
+      text-align: right;
+    }
+
+    .section { margin-bottom: 26px; }
+
+    .lead {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin: 0 0 18px;
+    }
+
+    .field { display: grid; gap: 8px; }
+
+    label, .field-label {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--ink);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    textarea { min-height: 130px; padding: 10px 12px; line-height: 1.4; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(102, 73, 145, 0.16);
+    }
+
+    .primary, .secondary, .danger {
+      min-height: 48px;
+      border-radius: 8px;
+      padding: 0 16px;
+      font-weight: 900;
+    }
+    .primary { background: var(--orange); color: var(--white); box-shadow: var(--shadow); }
+    .secondary { border: 1px solid var(--line); background: var(--white); color: var(--ink); }
+    .danger { background: var(--red-soft); color: #991b1b; }
+
+    .text-button {
+      min-height: 44px;
+      padding: 0;
+      background: transparent;
+      color: var(--orange-dark);
+      font-weight: 800;
+      text-align: left;
+    }
+    .text-button.danger-text { color: var(--red); }
+
+    .icon-button {
+      width: 48px;
+      min-width: 48px;
+      border-radius: 8px;
+      background: var(--ink);
+      color: var(--white);
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .counter {
+      margin: 14px 0 0;
+      padding: 12px;
+      border-radius: var(--radius);
+      background: rgba(102, 73, 145, 0.1);
+      color: var(--orange-dark);
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    /* --- Buy-in default + player rows --- */
+    .buyin-default {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .player-rows { display: grid; gap: 8px; margin-top: 4px; }
+
+    .player-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--player-color, var(--orange));
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 8px 10px;
+    }
+
+    .player-row-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.95rem;
+      font-weight: 850;
+    }
+
+    /* A player toggled out of the skins game (was on the card but not playing). */
+    .player-row.is-out {
+      opacity: 0.55;
+      border-left-color: var(--muted);
+      background: var(--surface);
+    }
+
+    .row-note {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .row-toggle {
+      min-height: 38px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--white);
+      color: var(--orange-dark);
+      padding: 0 14px;
+      font-size: 0.8rem;
+      font-weight: 850;
+    }
+    .player-row.is-out .row-toggle { color: var(--muted); }
+
+    .remove-chip {
+      width: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 999px;
+      background: var(--surface-strong);
+      color: var(--muted);
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+
+    /* "$" prefix sits inside the field so it reads as cash. */
+    .money-wrap {
+      display: inline-flex;
+      align-items: center;
+      width: 96px;
+      min-width: 96px;
+      padding-left: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--muted);
+      font-weight: 950;
+    }
+    .money-wrap:focus-within {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(102, 73, 145, 0.16);
+    }
+    .money-wrap input {
+      width: 100%;
+      min-width: 0;
+      min-height: 44px;
+      padding: 0 8px 0 4px;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      box-shadow: none;
+      font-weight: 950;
+    }
+    .money-wrap input:focus { box-shadow: none; }
+
+    .empty-state {
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+      padding: 16px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* --- Metrics --- */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .metric-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .metric {
+      min-height: 72px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .metric strong { display: block; margin-top: 4px; font-size: 1.15rem; }
+
+    @media (max-width: 559px) {
+      .metric-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* --- Import --- */
+    .drop-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 150px;
+      border: 2px dashed var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--muted);
+      padding: 18px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+    }
+    .drop-zone.is-dragover {
+      border-color: var(--orange);
+      background: rgba(102, 73, 145, 0.08);
+      color: var(--orange-dark);
+    }
+    .drop-zone strong { font-size: 1rem; color: var(--ink); }
+    .drop-zone .drop-sub { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    .divider-or {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .divider-or::before, .divider-or::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .paste-area {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+    }
+
+    .import-error {
+      margin-top: 12px;
+      border: 1px solid var(--red);
+      border-radius: var(--radius);
+      background: var(--red-soft);
+      color: #991b1b;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    /* --- Results / breakdown shared --- */
+    .subhead {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .round-meta {
+      margin: -6px 0 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .player-results { display: grid; gap: 10px; margin-bottom: 8px; }
+
+    .result-card {
+      display: grid;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-left: 8px solid var(--card-color, var(--orange));
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+    }
+    .result-card.is-winner { --card-color: var(--gold); }
+
+    .result-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .result-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1.05rem;
+      font-weight: 950;
+    }
+    .result-net { font-size: 1.05rem; font-weight: 950; white-space: nowrap; }
+    .result-net.pos { color: var(--green); }
+    .result-net.neg { color: var(--red); }
+    .result-net.even { color: var(--muted); }
+
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .result-stats.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .result-stat {
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 8px 10px;
+    }
+    .result-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .result-stat strong { display: block; margin-top: 3px; font-size: 1rem; }
+    /* Refund line under "Paid in" when a push is settled by splitting skins. */
+    .result-stat .split-note {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.62rem;
+      font-weight: 800;
+      font-style: normal;
+      line-height: 1.2;
+    }
+
+    .result-buyin {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .result-buyin label { font-size: 0.8rem; }
+
+    .carry-note {
+      margin: 0 0 18px;
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--orange);
+      border-radius: var(--radius);
+      background: rgba(102, 73, 145, 0.08);
+      color: var(--orange-dark);
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    /* Two-way choice for settling a round that ended on a push. */
+    .settlement-choice {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    /* Payment guidance (P2P settle-up) */
+    .p2p-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .p2p-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--player-color, var(--orange));
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 10px 12px;
+    }
+    .p2p-players { font-size: 0.95rem; font-weight: 800; }
+    .p2p-amount { margin-left: auto; font-size: 1rem; font-weight: 950; white-space: nowrap; }
+
+    /* Quick links out to the payment apps (open the app if installed, else web). */
+    .payment-apps {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .app-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      border-radius: 8px;
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+    .app-link.venmo { background: #008CFF; }
+    .app-link.cashapp { background: #00C244; }
+
+    /* Hole-by-hole breakdown */
+    .holes-list { display: grid; gap: 8px; }
+    .hole-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .hole-card.is-push { background: var(--surface); }
+    .hole-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .hole-card.is-push .hole-card-head { border-bottom-color: transparent; }
+    .hole-label { font-weight: 950; font-size: 0.9rem; }
+    .hole-label small { color: var(--muted); font-weight: 800; margin-left: 6px; }
+    .hole-outcome { font-size: 0.84rem; font-weight: 900; text-align: right; }
+    .hole-outcome.win { color: var(--gold); }
+    .hole-outcome.push { color: var(--orange-dark); }
+    .hole-scores {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 12px 10px;
+    }
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      background: var(--surface-strong);
+      color: var(--ink);
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      opacity: 0.5;
+    }
+    /* Low score on the hole: keep the player's fill but ring it in gold so the
+       "who's leading this hole" cue survives the per-player coloring. */
+    .score-pill.is-low { box-shadow: 0 0 0 2px var(--gold); }
+    /* The outright winner of a hole reads at full strength; everyone else dims. */
+    .score-pill.is-hole-winner { opacity: 1; }
+    .score-pill b { font-weight: 950; }
+
+    .toggle-breakdown {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--ink);
+      padding: 0 14px;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+    .toggle-breakdown .chev { transition: transform 160ms ease; color: var(--muted); }
+    .toggle-breakdown.is-open .chev { transform: rotate(180deg); }
+
+    /* --- Sticky actions + phase nav --- */
+    .sticky-actions {
+      position: fixed;
+      z-index: 30;
+      left: 0;
+      right: 0;
+      bottom: calc(var(--phase-nav-height) + var(--safe-bottom));
+      display: grid;
+      gap: 8px;
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: 12px 16px;
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(14px);
+    }
+    .sticky-actions.cols-2 { grid-template-columns: 1fr 1fr; }
+
+    .phase-nav {
+      position: fixed;
+      z-index: 35;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: min(100%, 760px);
+      height: calc(var(--phase-nav-height) + var(--safe-bottom));
+      margin: 0 auto;
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(14px);
+      padding: 8px 12px calc(8px + var(--safe-bottom));
+    }
+    .phase-nav-inner {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
+      height: 100%;
+    }
+    .phase-tab {
+      min-height: 48px;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      padding: 0 2px;
+      font-size: clamp(0.62rem, 3vw, 0.78rem);
+      font-weight: 950;
+      white-space: nowrap;
+    }
+    .phase-tab.is-active { background: var(--ink); color: var(--white); }
+    .phase-tab:disabled { opacity: 0.38; }
+
+    /* --- Share (step 4) --- */
+    .share-preview {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      padding: 10px;
+      margin-bottom: 14px;
+    }
+    .share-preview img { display: block; width: 100%; height: auto; border-radius: 8px; }
+    .share-preview-loading {
+      display: block;
+      padding: 34px 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+      text-align: center;
+    }
+    .share-actions { display: grid; gap: 10px; }
+    .share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    a.share-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--ink);
+      font-weight: 900;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+
+    /* --- Toast --- */
+    #toastHost {
+      position: fixed;
+      z-index: 60;
+      left: 50%;
+      bottom: calc(var(--phase-nav-height) + 24px + var(--safe-bottom));
+      transform: translateX(-50%);
+      display: grid;
+      gap: 8px;
+      width: min(92%, 420px);
+      pointer-events: none;
+    }
+    .toast {
+      border-radius: var(--radius);
+      background: var(--ink);
+      color: var(--white);
+      padding: 12px 14px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      box-shadow: var(--shadow-strong);
+    }
+  </style>
+</head>
+<body>
+  <noscript>
+    <div class="app-shell">
+      <p class="eyebrow">Disc golf skins</p>
+      <h1>Quick Skins</h1>
+      <p class="lead">Quick Skins is a free disc golf skins calculator. After your round, export your scorecard from UDisc as a CSV and drop it in — Quick Skins works out who won each hole, how carries and pushes stacked up, and exactly what everyone owes. Everything runs on your device; nothing is uploaded.</p>
+      <p class="lead">It installs to your phone's home screen like a regular app, with no App Store and no sign-up. See <a href="guide.html">how to install it</a> for step-by-step instructions.</p>
+      <p class="lead">This page needs JavaScript enabled to import a round and calculate payouts.</p>
+    </div>
+  </noscript>
+  <main id="app" aria-live="polite"></main>
+  <div id="toastHost" aria-live="assertive"></div>
+
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "quickSkins.v1";
+    let deferredInstallPrompt = null;
+
+    /* ------------------------------------------------------------------ *
+     * State
+     *   Flow: import -> breakdown (who's in + per-hole skins, no money)
+     *         -> payouts (enter buy-ins, money calculated)
+     *         -> share (payout picture + link that reopens the round)
+     * ------------------------------------------------------------------ */
+    const app = {
+      view: "import",         // "import" | "breakdown" | "payouts" | "share"
+      defaultBuyIn: 1,
+      pasteInput: "",
+      importError: "",
+      showHoles: true,        // hole-by-hole list expanded on the breakdown page
+      round: null             // parsed round (see parseRound)
+    };
+
+    /* ------------------------------------------------------------------ *
+     * Persistence
+     * ------------------------------------------------------------------ */
+    function save() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          view: app.view,
+          defaultBuyIn: app.defaultBuyIn,
+          round: app.round
+        }));
+      } catch (e) { /* storage may be unavailable; ignore */ }
+    }
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (typeof data.defaultBuyIn === "number") app.defaultBuyIn = data.defaultBuyIn;
+        if (data.round && Array.isArray(data.round.players)) {
+          data.round.players.forEach(p => {
+            if (p.included === undefined) p.included = true;
+            if (p.buyIn === undefined) p.buyIn = num(app.defaultBuyIn, 1);
+          });
+          app.round = data.round;
+        }
+        if (app.round && (data.view === "breakdown" || data.view === "payouts" || data.view === "share")) app.view = data.view;
+        else app.view = "import";
+      } catch (e) { /* corrupt state; start fresh */ }
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Helpers
+     * ------------------------------------------------------------------ */
+    function escapeHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, c => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+      ));
+    }
+
+    function num(v, fallback) {
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : (fallback === undefined ? 0 : fallback);
+    }
+
+    function fmtMoney(n) {
+      const r = Math.round((n + Number.EPSILON) * 100) / 100;
+      const s = Number.isInteger(r) ? String(r) : r.toFixed(2);
+      return "$" + s;
+    }
+
+    function fmtSignedMoney(n) {
+      const r = Math.round((n + Number.EPSILON) * 100) / 100;
+      if (r === 0) return "$0";
+      const sign = r > 0 ? "+" : "−"; // + / minus
+      return sign + fmtMoney(Math.abs(r));
+    }
+
+    function toast(msg) {
+      const host = document.getElementById("toastHost");
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = msg;
+      host.appendChild(el);
+      setTimeout(() => el.remove(), 3200);
+    }
+
+    function pluralize(n, word) {
+      return n + " " + word + (n === 1 ? "" : "s");
+    }
+
+    function isStandaloneApp() {
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    async function promptInstallApp() {
+      if (!deferredInstallPrompt) {
+        toast("Open your browser menu and choose Install app or Add to Home screen.");
+        return;
+      }
+
+      const promptEvent = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      try {
+        await promptEvent.prompt();
+        const choice = await promptEvent.userChoice.catch(() => null);
+        if (choice && choice.outcome === "accepted") toast("Installing Quick Skins.");
+        else toast("Install dismissed.");
+      } catch (e) {
+        toast("Open your browser menu and choose Install app or Add to Home screen.");
+      }
+    }
+
+    /* ------------------------------------------------------------------ *
+     * CSV parsing (handles quoted fields)
+     * ------------------------------------------------------------------ */
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], field = "", inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inQuotes) {
+          if (ch === '"') {
+            if (text[i + 1] === '"') { field += '"'; i++; }
+            else inQuotes = false;
+          } else field += ch;
+        } else if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ",") {
+          row.push(field); field = "";
+        } else if (ch === "\n") {
+          row.push(field); rows.push(row); row = []; field = "";
+        } else if (ch === "\r") {
+          // ignore; handled by \n
+        } else field += ch;
+      }
+      if (field !== "" || row.length) { row.push(field); rows.push(row); }
+      return rows.filter(r => r.some(c => c.trim() !== ""));
+    }
+
+    // Turn a UDisc CSV into a round object, or return { error }.
+    function parseRound(text) {
+      const rows = parseCSV(text);
+      if (rows.length < 2) return { error: "That file doesn't look like a UDisc round export." };
+
+      const header = rows[0].map(h => h.trim());
+      const find = name => header.findIndex(h => h.toLowerCase() === name.toLowerCase());
+      const nameIdx = find("PlayerName");
+      const courseIdx = find("CourseName");
+      const layoutIdx = find("LayoutName");
+      const startIdx = find("StartDate");
+
+      const holeCols = [];
+      header.forEach((h, i) => {
+        const m = h.match(/^Hole\s*(\d+)$/i);
+        if (m) holeCols.push({ i, num: parseInt(m[1], 10) });
+      });
+      holeCols.sort((a, b) => a.num - b.num);
+
+      if (nameIdx < 0 || holeCols.length === 0) {
+        return { error: "Couldn't find a PlayerName column and hole scores. Is this a UDisc round export?" };
+      }
+
+      let par = null, courseName = "", layoutName = "", date = "";
+      const players = [];
+
+      for (let r = 1; r < rows.length; r++) {
+        const cells = rows[r];
+        const pname = (cells[nameIdx] || "").trim();
+        if (!pname) continue;
+        if (!courseName && courseIdx >= 0) courseName = (cells[courseIdx] || "").trim();
+        if (!layoutName && layoutIdx >= 0) layoutName = (cells[layoutIdx] || "").trim();
+        if (!date && startIdx >= 0) date = (cells[startIdx] || "").trim();
+
+        const scores = holeCols.map(c => {
+          const v = (cells[c.i] || "").trim();
+          const n = parseInt(v, 10);
+          // UDisc writes 0 for holes a player didn't play (left early, joined
+          // late). No real score can be 0 or less, so treat those as absent.
+          return Number.isFinite(n) && v !== "" && n > 0 ? n : null;
+        });
+
+        if (pname.toLowerCase() === "par") { par = scores; continue; }
+        players.push({ name: pname, scores, included: true });
+      }
+
+      if (players.length < 1) return { error: "No player scores found in that file." };
+
+      return {
+        courseName, layoutName, date,
+        holeNumbers: holeCols.map(c => c.num),
+        par,
+        players // buyIn added when stored
+      };
+    }
+
+    function formatRoundDate(raw) {
+      // UDisc StartDate looks like "2026-06-29 1655-0400"
+      if (!raw) return "";
+      const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) return raw;
+      const d = new Date(+m[1], +m[2] - 1, +m[3]);
+      if (isNaN(d)) return raw;
+      return d.toLocaleDateString(undefined, { weekday: "short", month: "long", day: "numeric", year: "numeric" });
+    }
+
+    function roundMeta(round) {
+      const bits = [];
+      if (round.courseName) bits.push(escapeHtml(round.courseName));
+      if (round.layoutName) bits.push(escapeHtml(round.layoutName));
+      const d = formatRoundDate(round.date);
+      if (d) bits.push(escapeHtml(d));
+      return bits.join(" &middot; ");
+    }
+
+    function includedPlayers() {
+      return app.round ? app.round.players.filter(p => p.included !== false) : [];
+    }
+
+    // Rotating palette for player emblems on the breakdown page. Keyed by each
+    // player's fixed position in the imported card, so a player keeps the same
+    // color band no matter who else is toggled in or out of the skins game.
+    const PLAYER_CARD_COLORS = ["#664991", "#914950", "#749149", "#49918a"];
+
+    function playerCardColors(round) {
+      const map = {};
+      round.players.forEach((p, i) => {
+        map[p.name] = PLAYER_CARD_COLORS[i % PLAYER_CARD_COLORS.length];
+      });
+      return map;
+    }
+
+    // Pick black or white text for legibility on top of a given hex fill.
+    function readableTextOn(hex) {
+      const c = hex.replace("#", "");
+      const r = parseInt(c.slice(0, 2), 16);
+      const g = parseInt(c.slice(2, 4), 16);
+      const b = parseInt(c.slice(4, 6), 16);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.6 ? "#261337" : "#ffffff";
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Skins logic
+     *   - Only players marked "included" compete (others were on the card
+     *     but not in the skins game, so their scores don't count).
+     *   - A player is only "in" a hole if they have a score for it. UDisc
+     *     writes 0 for holes someone skipped (left early / joined late);
+     *     those are normalized to null at import.
+     *   - A hole needs at least 2 players in to be contested. Solo or empty
+     *     holes carry no skin and cost nobody a buy-in.
+     *   - Each contested hole's skin is worth the sum of the buy-ins of the
+     *     players actually on it, so short-handed holes are worth less.
+     *   - Lowest unique score wins the hole's value plus any money carried
+     *     from prior ties. A tie pushes the hole's money onto the carry.
+     * ------------------------------------------------------------------ */
+    function computeSkins(round) {
+      const players = round.players.filter(p => p.included !== false);
+      // Full-field rate, used for display; short-handed holes are worth less.
+      const holeValue = players.reduce((s, p) => s + num(p.buyIn, 0), 0);
+      const totalHoles = round.holeNumbers.length;
+
+      const stats = {};
+      players.forEach(p => {
+        stats[p.name] = { name: p.name, buyIn: num(p.buyIn, 0), holesWon: 0, skinsWon: 0, moneyWon: 0, holesIn: 0 };
+      });
+
+      const holeResults = [];
+      let carrySkins = 0;         // pushed holes waiting to be claimed
+      let carryValue = 0;         // money riding on them
+      let carryContribs = {};     // who funded the current carry (for skin split)
+      let playedCount = 0;        // contested holes
+      let totalPot = 0;
+      const skippedHoles = [];    // hole numbers with fewer than 2 players in
+      const shortHandedHoles = []; // contested, but someone was missing
+
+      for (let h = 0; h < totalHoles; h++) {
+        const inHole = players.filter(p => p.scores[h] != null);
+        if (inHole.length === 0) continue; // nobody played it — not part of the round
+
+        if (inHole.length < 2) {
+          // Solo hole (someone playing ahead or behind the group): nothing to
+          // contest, so no skin, no buy-in, and any carry rides straight past.
+          skippedHoles.push(round.holeNumbers[h]);
+          holeResults.push({
+            holeNumber: round.holeNumbers[h],
+            par: round.par ? round.par[h] : null,
+            low: null,
+            potSkins: 0,
+            potValue: 0,
+            scores: players.map(p => ({ name: p.name, score: p.scores[h], isLow: false })),
+            winner: null,
+            push: false,
+            skipped: true
+          });
+          continue;
+        }
+
+        playedCount++;
+        const hv = inHole.reduce((s, p) => s + num(p.buyIn, 0), 0);
+        totalPot += hv;
+        inHole.forEach(p => { stats[p.name].holesIn++; });
+        if (inHole.length < players.length) shortHandedHoles.push(round.holeNumbers[h]);
+
+        const potSkins = carrySkins + 1;
+        const potValue = carryValue + hv;
+        let low = Infinity;
+        inHole.forEach(p => { if (p.scores[h] < low) low = p.scores[h]; });
+        const leaders = inHole.filter(p => p.scores[h] === low);
+
+        const result = {
+          holeNumber: round.holeNumbers[h],
+          par: round.par ? round.par[h] : null,
+          low,
+          potSkins,
+          potValue,
+          scores: players.map(p => ({ name: p.name, score: p.scores[h], isLow: p.scores[h] != null && p.scores[h] === low })),
+          winner: null,
+          push: false,
+          skipped: false
+        };
+
+        if (leaders.length === 1) {
+          const w = leaders[0].name;
+          result.winner = w;
+          stats[w].holesWon += 1;
+          stats[w].skinsWon += potSkins;
+          stats[w].moneyWon += potValue;
+          carrySkins = 0;
+          carryValue = 0;
+          carryContribs = {};
+        } else {
+          result.push = true;
+          carrySkins += 1;
+          carryValue += hv;
+          inHole.forEach(p => { carryContribs[p.name] = (carryContribs[p.name] || 0) + num(p.buyIn, 0); });
+        }
+        holeResults.push(result);
+      }
+
+      const playerSummary = players.map(p => {
+        const st = stats[p.name];
+        return {
+          name: p.name,
+          buyIn: st.buyIn,
+          holesWon: st.holesWon,
+          skinsWon: st.skinsWon,
+          holesIn: st.holesIn,
+          contribution: st.buyIn * st.holesIn, // only holes they actually played
+          moneyWon: st.moneyWon,
+          net: st.moneyWon - st.buyIn * st.holesIn
+        };
+      });
+
+      // Settling a round that ended on a push. Hole-by-hole results above stay
+      // factual; only the summary/payout reflects the chosen settlement.
+      let leftoverSkins = carrySkins;
+      let leftoverValue = carryValue;
+      let ctpAward = null;
+      let skinSplit = null;
+      if (carrySkins > 0 && round.pushSettlement === "split") {
+        // Skin split: the carried skins are never awarded. Everyone gets back
+        // exactly what they themselves put into the unclaimed holes.
+        playerSummary.forEach(p => {
+          const refund = carryContribs[p.name] || 0;
+          if (refund) {
+            p.skinSplitRefund = refund;
+            p.contribution -= refund;
+            p.net += refund;
+          }
+        });
+        skinSplit = { skins: carrySkins, value: carryValue };
+        leftoverSkins = 0;
+        leftoverValue = 0;
+      } else if (carrySkins > 0 && round.ctpWinner) {
+        // Closest-to-the-pin: the recorded winner claims the whole carry.
+        const winner = playerSummary.find(p => p.name === round.ctpWinner);
+        if (winner) {
+          winner.skinsWon += carrySkins;
+          winner.moneyWon += carryValue;
+          winner.net += carryValue;
+
+          // Walk back through the trailing run of pushes that produced this
+          // carry (skipping solo holes, which never feed or break a carry).
+          let startHole = null, endHole = null;
+          for (let i = holeResults.length - 1; i >= 0; i--) {
+            const hr = holeResults[i];
+            if (hr.skipped) continue;
+            if (!hr.push) break;
+            startHole = hr.holeNumber;
+            if (endHole === null) endHole = hr.holeNumber;
+          }
+
+          ctpAward = { name: winner.name, skins: carrySkins, value: carryValue, startHole, endHole };
+          leftoverSkins = 0;
+          leftoverValue = 0;
+        }
+      }
+
+      // Money first (hole values differ when someone missed a hole), skins
+      // count as the tiebreak so the money-less breakdown page still reads
+      // in order. With full attendance the two orders are identical.
+      playerSummary.sort((a, b) => b.moneyWon - a.moneyWon || b.skinsWon - a.skinsWon || a.name.localeCompare(b.name));
+
+      const topMoney = playerSummary.reduce((m, p) => Math.max(m, p.moneyWon), 0);
+      const topSkins = playerSummary.reduce((m, p) => Math.max(m, p.skinsWon), 0);
+      const topNet = playerSummary.reduce((m, p) => Math.max(m, p.net), -Infinity);
+
+      return {
+        holeValue,
+        totalHoles,
+        playedCount,
+        totalPot,
+        holeResults,
+        players: playerSummary,
+        leftoverSkins,
+        leftoverValue,
+        skippedHoles,
+        shortHandedHoles,
+        ctpAward,
+        skinSplit,
+        topMoney,
+        topSkins,
+        topNet
+      };
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Payment guidance (peer-to-peer settle-up)
+     *   Winners = net > 0, losers = net < 0 (players who broke even settle to
+     *   nothing and are ignored). In a settled round the winners' gains equal
+     *   the losers' debts, so this closes out with the fewest hops:
+     *     - every loser pays the top winner their whole debt;
+     *     - the winners form a chain — each winner forwards the combined nets
+     *       of everyone below them to the next winner, and the last winner
+     *       (and anyone even) does nothing.
+     *   This reproduces every hand-specified 4- and 5-player case.
+     * ------------------------------------------------------------------ */
+    function computeP2PPayments(players) {
+      const EPS = 0.005; // sub-cent noise counts as even
+      const winners = players.filter(p => p.net > EPS)
+        .slice().sort((a, b) => b.net - a.net || a.name.localeCompare(b.name));
+      const losers = players.filter(p => p.net < -EPS)
+        .slice().sort((a, b) => a.net - b.net || a.name.localeCompare(b.name));
+
+      const payments = [];
+      if (winners.length === 0 || losers.length === 0) return { payments, allEven: true };
+
+      const top = winners[0];
+      // Losers each pay the top winner their full debt.
+      losers.forEach(l => payments.push({ from: l.name, to: top.name, amount: -l.net }));
+
+      // Winner chain: W_i forwards the combined nets of W_{i+1..end} to W_{i+1}.
+      for (let i = 0; i < winners.length - 1; i++) {
+        let downstream = 0;
+        for (let j = i + 1; j < winners.length; j++) downstream += winners[j].net;
+        if (downstream > EPS) {
+          payments.push({ from: winners[i].name, to: winners[i + 1].name, amount: downstream });
+        }
+      }
+      return { payments, allEven: false };
+    }
+
+    // Inner HTML for the Payment Guidance section, kept separate so it can be
+    // re-rendered in place by refreshPayouts as buy-ins change.
+    function paymentGuidanceInner(r) {
+      if (r.leftoverSkins > 0) {
+        return `<p class="lead" style="margin:0;">Settle the carried skins above first, then we'll suggest who pays whom.</p>`;
+      }
+      const n = r.players.length;
+      if (n < 4) {
+        return `<p class="lead" style="margin:0;">With only ${n} players, keep it simple &mdash; figure it out yourselves.</p>`;
+      }
+      const { payments, allEven } = computeP2PPayments(r.players);
+      if (allEven || payments.length === 0) {
+        return `<p class="lead" style="margin:0;">Everyone came out even &mdash; no payments needed.</p>`;
+      }
+      // Band each row with the payer's (first-named player's) check-in color.
+      const colors = playerCardColors(app.round);
+      const items = payments.map(pay => `
+        <li class="p2p-row" style="--player-color:${colors[pay.from]}">
+          <span class="p2p-players"><strong>${escapeHtml(pay.from)}</strong> pays <strong>${escapeHtml(pay.to)}</strong></span>
+          <span class="p2p-amount">${fmtMoney(pay.amount)}</span>
+        </li>`).join("");
+      return `<ul class="p2p-list">${items}</ul>`;
+    }
+
+    // "Per hole" reads "up to $X" when short-handed holes made some skins
+    // worth less than the full-field rate.
+    function perHoleLabel(r) {
+      const partial = r.skippedHoles.length || r.shortHandedHoles.length;
+      return (partial ? "up to " : "") + fmtMoney(r.holeValue);
+    }
+
+    // Shown on breakdown + payouts whenever someone missed holes mid-round.
+    function partialPresenceNote(r) {
+      if (!r.skippedHoles.length && !r.shortHandedHoles.length) return "";
+      const soloBit = r.skippedHoles.length
+        ? ` Hole${r.skippedHoles.length > 1 ? "s" : ""} ${r.skippedHoles.join(", ")} had just one player, so no skin was played there.`
+        : "";
+      return `<p class="carry-note">Not everyone played every hole. Each hole's skin is worth the buy-ins of the players who played it, and nobody pays for holes they missed.${soloBit}</p>`;
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Share (step 4)
+     *   Two artifacts, both built on-device:
+     *   - a PNG of the per-player payout, drawn on a canvas; and
+     *   - a link with the whole round packed into the #r= hash, so whoever
+     *     opens it lands in Quick Skins with this round already imported.
+     *   navigator.share (with the picture attached where supported) covers
+     *   texting/email on phones; copy/save buttons cover everything else.
+     * ------------------------------------------------------------------ */
+    function b64urlEncode(str) {
+      const bytes = new TextEncoder().encode(str);
+      let bin = "";
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function b64urlDecode(str) {
+      let s = str.replace(/-/g, "+").replace(/_/g, "/");
+      while (s.length % 4) s += "=";
+      const bin = atob(s);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    }
+
+    // Scores and pars pack to one character each: null -> "-", 0-9 -> the
+    // digit, 10-35 -> a-z. Nobody cards worse than a 35.
+    function encodeScoreChar(n) {
+      if (n == null || !Number.isFinite(n)) return "-";
+      if (n <= 9) return String(Math.max(0, n));
+      if (n <= 35) return String.fromCharCode(97 + (n - 10));
+      return "z";
+    }
+
+    function decodeScoreChar(ch) {
+      if (ch >= "0" && ch <= "9") return ch.charCodeAt(0) - 48;
+      if (ch >= "a" && ch <= "z") return ch.charCodeAt(0) - 87; // a=10
+      return null;
+    }
+
+    // Hole numbers as compact ranges: [1..18] -> "1-18", [1,2,3,7] -> "1-3,7".
+    function encodeHoleRanges(nums) {
+      const parts = [];
+      let start = null, prev = null;
+      for (const n of nums) {
+        if (start === null) { start = prev = n; continue; }
+        if (n === prev + 1) { prev = n; continue; }
+        parts.push(start === prev ? String(start) : start + "-" + prev);
+        start = prev = n;
+      }
+      if (start !== null) parts.push(start === prev ? String(start) : start + "-" + prev);
+      return parts.join(",");
+    }
+
+    function decodeHoleRanges(s) {
+      const out = [];
+      for (const part of String(s).split(",")) {
+        const m = part.match(/^(\d+)(?:-(\d+))?$/);
+        if (!m) return null;
+        const a = parseInt(m[1], 10);
+        const b = m[2] ? parseInt(m[2], 10) : a;
+        if (b < a || b - a > 99 || out.length + (b - a) > 99) return null;
+        for (let i = a; i <= b; i++) out.push(i);
+      }
+      return out.length ? out : null;
+    }
+
+    // Pack the round (players, scores, buy-ins, settlement) into a compact
+    // base64url payload. Nothing is uploaded; the round travels in the URL.
+    // Kept deliberately terse — every byte here is a character in the text
+    // message the link gets pasted into. Layout ("|"-separated, 9 header
+    // fields then one field per player):
+    //   2|course|layout|date|holes|par|settlement|ctpIndex|defaultBuyIn|
+    //   name;scores;included;buyIn|...
+    function encodeRoundForShare() {
+      const round = app.round;
+      const ctpIdx = round.ctpWinner ? round.players.findIndex(p => p.name === round.ctpWinner) : -1;
+      const head = [
+        "2",
+        encodeURIComponent(round.courseName || ""),
+        encodeURIComponent(round.layoutName || ""),
+        String(round.date || "").slice(0, 10),
+        encodeHoleRanges(round.holeNumbers),
+        round.par ? round.par.map(encodeScoreChar).join("") : "",
+        round.pushSettlement === "ctp" ? "c" : (round.pushSettlement === "split" ? "s" : ""),
+        ctpIdx >= 0 ? String(ctpIdx) : "",
+        String(num(app.defaultBuyIn, 1))
+      ];
+      const players = round.players.map(p =>
+        encodeURIComponent(p.name) + ";" +
+        p.scores.map(encodeScoreChar).join("") + ";" +
+        (p.included === false ? "0" : "1") + ";" +
+        num(p.buyIn, 0)
+      );
+      return b64urlEncode(head.concat(players).join("|"));
+    }
+
+    function decodeRoundV2(raw) {
+      const f = raw.split("|");
+      if (f.length < 10) throw new Error("bad payload");
+      const holes = decodeHoleRanges(f[4]);
+      if (!holes) throw new Error("bad holes");
+      const parDigits = f[5];
+      const players = f.slice(9).map(seg => {
+        const q = seg.split(";");
+        const name = decodeURIComponent(q[0] || "").trim();
+        if (!name) throw new Error("bad player");
+        const digits = q[1] || "";
+        return {
+          name,
+          scores: holes.map((_, i) => {
+            const s = decodeScoreChar(digits[i] || "-");
+            return s > 0 ? s : null; // 0 or less = didn't play the hole
+          }),
+          included: q[2] !== "0",
+          buyIn: num(q[3], 1)
+        };
+      });
+      const ctpIdx = f[7] === "" ? -1 : parseInt(f[7], 10);
+      return {
+        round: {
+          courseName: decodeURIComponent(f[1] || ""),
+          layoutName: decodeURIComponent(f[2] || ""),
+          date: f[3] || "",
+          holeNumbers: holes,
+          par: parDigits ? holes.map((_, i) => {
+            const v = decodeScoreChar(parDigits[i] || "-");
+            return v > 0 ? v : null;
+          }) : null,
+          pushSettlement: f[6] === "c" ? "ctp" : (f[6] === "s" ? "split" : null),
+          ctpWinner: ctpIdx >= 0 && players[ctpIdx] ? players[ctpIdx].name : null,
+          players
+        },
+        defaultBuyIn: num(f[8], 1)
+      };
+    }
+
+    // First-generation links carried the round as plain JSON; keep reading
+    // them so links already texted around don't die.
+    function decodeRoundV1(data) {
+      const holes = Array.isArray(data.h) ? data.h.map(n => parseInt(n, 10)).filter(Number.isFinite) : [];
+      const players = (Array.isArray(data.pl) ? data.pl : [])
+        .filter(a => Array.isArray(a) && String(a[0] == null ? "" : a[0]).trim())
+        .map(a => ({
+          name: String(a[0]).trim(),
+          scores: holes.map((_, i) => {
+            const s = Array.isArray(a[1]) ? a[1][i] : null;
+            // Links made before the 0-means-absent fix can carry raw zeroes.
+            return Number.isFinite(s) && s > 0 ? s : null;
+          }),
+          included: a[2] !== 0,
+          buyIn: num(a[3], 1)
+        }));
+      if (!holes.length) throw new Error("bad holes");
+      return {
+        round: {
+          courseName: String(data.c || ""),
+          layoutName: String(data.l || ""),
+          date: String(data.d || ""),
+          holeNumbers: holes,
+          par: Array.isArray(data.p) ? holes.map((_, i) => (Number.isFinite(data.p[i]) && data.p[i] > 0 ? data.p[i] : null)) : null,
+          pushSettlement: data.ps === "ctp" || data.ps === "split" ? data.ps : null,
+          ctpWinner: data.cw ? String(data.cw) : null,
+          players
+        },
+        defaultBuyIn: typeof data.b === "number" && data.b >= 0 ? data.b : null
+      };
+    }
+
+    function buildShareUrl() {
+      return location.origin + location.pathname + "#r=" + encodeRoundForShare();
+    }
+
+    // Full message with the per-player summary — used where no picture rides
+    // along (Text the link / Email the link), so the numbers travel as text.
+    function shareMessageText(url) {
+      const r = computeSkins(app.round);
+      const course = app.round.courseName ? " at " + app.round.courseName : "";
+      const results = r.players.map(p => p.name + " " + fmtSignedMoney(p.net)).join(", ");
+      return "Skins payouts" + course + ": " + results + ". Full breakdown: " + url;
+    }
+
+    // "2026-07-02 0925-0400" -> "Thu, July 2, 2026, 9:25 AM"; date-only when
+    // the export (or a reshared link) carries no time.
+    function formatRoundDateTime(raw) {
+      if (!raw) return "";
+      const m = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):?(\d{2}))?/);
+      if (!m) return String(raw);
+      const d = new Date(+m[1], +m[2] - 1, +m[3], m[4] ? +m[4] : 0, m[5] ? +m[5] : 0);
+      if (isNaN(d)) return String(raw);
+      const dateStr = d.toLocaleDateString(undefined, { weekday: "short", month: "long", day: "numeric", year: "numeric" });
+      if (!m[4]) return dateStr;
+      return dateStr + ", " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    }
+
+    // Short message for the share sheet — the attached picture carries the
+    // per-player numbers, so the text stays out of the way.
+    function shareShortMessageText(url) {
+      const round = app.round;
+      let head = "Skins payouts";
+      if (round.courseName) head += " at " + round.courseName;
+      const when = formatRoundDateTime(round.date);
+      if (when) head += " — " + when;
+      return head + ". Full breakdown: " + url;
+    }
+
+    // A shared round link (#r=...) opens here on boot: unpack it and drop the
+    // reader into the breakdown, exactly where the original importer started.
+    function checkSharedRoundLink() {
+      const m = (location.hash || "").match(/^#r=([A-Za-z0-9_-]+)$/);
+      if (!m) return false;
+      const clearHash = () => history.replaceState(null, "", location.pathname + location.search);
+      try {
+        if (m[1].length > 20000) throw new Error("payload too large");
+        const raw = b64urlDecode(m[1]);
+        const decoded = raw.startsWith("2|") ? decodeRoundV2(raw) : decodeRoundV1(JSON.parse(raw));
+        if (!decoded.round.players.length) throw new Error("no players");
+
+        app.round = decoded.round;
+        if (typeof decoded.defaultBuyIn === "number" && decoded.defaultBuyIn >= 0) {
+          app.defaultBuyIn = decoded.defaultBuyIn;
+        }
+        app.importError = "";
+        app.showHoles = true;
+        app.view = "breakdown";
+        save();
+        clearHash();
+        toast("Shared round loaded — " + pluralize(decoded.round.players.length, "player") + ", ready to review.");
+        return true;
+      } catch (e) {
+        clearHash();
+        toast("That shared round link couldn't be read — ask for a fresh one.");
+        return false;
+      }
+    }
+
+    /* ---- Payout picture (canvas -> PNG) ---- */
+    let shareCanvas = null;
+    let shareImageBlob = null;
+
+    function shareFont(weight, sizePx) {
+      return weight + " " + sizePx + "px -apple-system, 'Segoe UI', Roboto, sans-serif";
+    }
+
+    function roundRectPath(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function wrapCanvasText(ctx, text, maxWidth) {
+      const words = String(text).split(/\s+/);
+      const lines = [];
+      let line = "";
+      for (const w of words) {
+        const t = line ? line + " " + w : w;
+        if (ctx.measureText(t).width > maxWidth && line) { lines.push(line); line = w; }
+        else line = t;
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function truncateCanvasText(ctx, text, maxWidth) {
+      let t = String(text);
+      if (ctx.measureText(t).width <= maxWidth) return t;
+      while (t.length > 1 && ctx.measureText(t + "…").width > maxWidth) t = t.slice(0, -1);
+      return t + "…";
+    }
+
+    // Draw the per-player payout as a canvas, 2x scale for crisp text.
+    function drawShareImage() {
+      const round = app.round;
+      const r = computeSkins(round);
+      const cardColors = playerCardColors(round);
+      const C = {
+        ink: "#261337", muted: "#6E6478", line: "#D3CDDC",
+        purple: "#664991", purpleDark: "#482669",
+        green: "#15803d", red: "#b91c1c", gold: "#E8A623"
+      };
+      const W = 560, pad = 26, cardH = 76, cardGap = 10;
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // How the round's carryover was (or wasn't) settled, mirroring payouts.
+      let note = "";
+      if (r.leftoverSkins > 0) {
+        note = pluralize(r.leftoverSkins, "skin") + " (" + fmtMoney(r.leftoverValue) + ") carried past the last hole with no winner — settle it as a group.";
+      } else if (r.ctpAward) {
+        note = r.ctpAward.name + " won closest-to-the-pin and claimed " + pluralize(r.ctpAward.skins, "skin") + " (" + fmtMoney(r.ctpAward.value) + ").";
+      } else if (r.skinSplit) {
+        note = "Skin split: " + pluralize(r.skinSplit.skins, "skin") + " (" + fmtMoney(r.skinSplit.value) + ") went back to the players.";
+      }
+      ctx.font = shareFont(700, 13);
+      const noteLines = note ? wrapCanvasText(ctx, note, W - pad * 2 - 28) : [];
+      const noteH = noteLines.length ? noteLines.length * 18 + 16 : 0;
+
+      const metaBits = [];
+      if (round.layoutName) metaBits.push(round.layoutName);
+      const dateLabel = formatRoundDate(round.date);
+      if (dateLabel) metaBits.push(dateLabel);
+      const metaLine = metaBits.join(" · ");
+
+      let H = pad + 20 + 32;            // top pad + eyebrow + title
+      if (metaLine) H += 22;
+      H += 30;                          // metrics line
+      if (noteH) H += noteH + 12;
+      H += 24;                          // section subhead
+      H += r.players.length * (cardH + cardGap) - cardGap;
+      H += 57 + pad;                    // footer + bottom pad
+
+      const SCALE = 2;
+      canvas.width = W * SCALE;
+      canvas.height = H * SCALE;
+      ctx.scale(SCALE, SCALE);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
+      ctx.textBaseline = "alphabetic";
+
+      let y = pad;
+      ctx.fillStyle = C.purple;
+      ctx.font = shareFont(800, 12);
+      ctx.fillText("QUICK SKINS — PAYOUTS", pad, y + 12);
+      y += 20;
+
+      ctx.fillStyle = C.ink;
+      ctx.font = shareFont(900, 23);
+      ctx.fillText(truncateCanvasText(ctx, round.courseName || "Skins round", W - pad * 2), pad, y + 22);
+      y += 32;
+
+      if (metaLine) {
+        ctx.fillStyle = C.muted;
+        ctx.font = shareFont(700, 13);
+        ctx.fillText(truncateCanvasText(ctx, metaLine, W - pad * 2), pad, y + 13);
+        y += 22;
+      }
+
+      ctx.fillStyle = C.muted;
+      ctx.font = shareFont(800, 13);
+      ctx.fillText(
+        r.players.length + " players · " + pluralize(r.playedCount, "hole") + " · " + perHoleLabel(r) + " per hole · " + fmtMoney(r.totalPot) + " pot",
+        pad, y + 13
+      );
+      y += 30;
+
+      if (noteLines.length) {
+        roundRectPath(ctx, pad, y, W - pad * 2, noteH, 10);
+        ctx.fillStyle = "rgba(102, 73, 145, 0.08)";
+        ctx.fill();
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = C.purpleDark;
+        ctx.font = shareFont(700, 13);
+        noteLines.forEach((line, i) => ctx.fillText(line, pad + 14, y + 20 + i * 18));
+        y += noteH + 12;
+      }
+
+      ctx.fillStyle = C.muted;
+      ctx.font = shareFont(900, 11);
+      ctx.fillText("PER-PLAYER PAYOUT", pad, y + 11);
+      y += 24;
+
+      r.players.forEach(p => {
+        const isWinner = p.net === r.topNet && r.topNet > 0;
+        const band = isWinner ? C.gold : (cardColors[p.name] || C.purple);
+
+        ctx.save();
+        roundRectPath(ctx, pad, y, W - pad * 2, cardH, 12);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = C.line;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.clip();
+        ctx.fillStyle = band;
+        ctx.fillRect(pad, y, 8, cardH);
+        ctx.restore();
+
+        const tx = pad + 22;
+        const netStr = fmtSignedMoney(p.net);
+        ctx.font = shareFont(900, 17);
+        const netW = ctx.measureText(netStr).width;
+        ctx.fillStyle = p.net > 0 ? C.green : (p.net < 0 ? C.red : C.muted);
+        ctx.fillText(netStr, W - pad - 14 - netW, y + 31);
+
+        ctx.fillStyle = C.ink;
+        ctx.fillText(
+          truncateCanvasText(ctx, p.name + (isWinner ? " \u{1F3C6}" : ""), W - pad - 14 - netW - tx - 10),
+          tx, y + 31
+        );
+
+        ctx.fillStyle = C.muted;
+        ctx.font = shareFont(800, 12.5);
+        let statLine = pluralize(p.skinsWon, "skin") + " · won " + fmtMoney(p.moneyWon) + " · paid in " + fmtMoney(p.contribution);
+        if (p.skinSplitRefund) statLine += " (−" + fmtMoney(p.skinSplitRefund) + " skin split)";
+        ctx.fillText(truncateCanvasText(ctx, statLine, W - pad - 14 - tx), tx, y + 56);
+
+        y += cardH + cardGap;
+      });
+      y -= cardGap;
+
+      y += 20;
+      ctx.strokeStyle = C.line;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad, y);
+      ctx.lineTo(W - pad, y);
+      ctx.stroke();
+
+      ctx.fillStyle = C.muted;
+      ctx.font = shareFont(800, 12.5);
+      ctx.fillText("Tap the link for the full hole-by-hole breakdown", pad, y + 20);
+      ctx.fillStyle = C.purple;
+      ctx.font = shareFont(900, 13);
+      ctx.fillText(location.host || "skins.spiris.app", pad, y + 40);
+
+      return canvas;
+    }
+
+    // Fill the preview box on the share page and cache the PNG for sharing.
+    function updateSharePreview() {
+      const host = document.getElementById("sharePreview");
+      if (!host || !app.round) return;
+      try {
+        shareCanvas = drawShareImage();
+        shareImageBlob = null;
+        shareCanvas.toBlob(b => { shareImageBlob = b; }, "image/png");
+        const img = document.createElement("img");
+        img.alt = "Per-player payout picture for this round";
+        img.src = shareCanvas.toDataURL("image/png");
+        host.innerHTML = "";
+        host.appendChild(img);
+      } catch (e) {
+        shareCanvas = null;
+        shareImageBlob = null;
+        host.innerHTML = `<span class="share-preview-loading">Couldn't build the picture here &mdash; the link below still works.</span>`;
+      }
+    }
+
+    // e.g. "QuickSkins-Maple Hill-2026-06-29.png"; pieces drop out when the
+    // export didn't include a course name or date.
+    function shareImageFileName() {
+      const round = app.round || {};
+      const bits = ["QuickSkins"];
+      const course = String(round.courseName || "").replace(/[<>:"/\\|?*\x00-\x1f]/g, "").trim();
+      if (course) bits.push(course);
+      const m = String(round.date || "").match(/^\d{4}-\d{2}-\d{2}/);
+      if (m) bits.push(m[0]);
+      return bits.join("-") + ".png";
+    }
+
+    async function getShareImageFile() {
+      try {
+        if (!shareCanvas) shareCanvas = drawShareImage();
+        const blob = shareImageBlob || await new Promise(res => shareCanvas.toBlob(res, "image/png"));
+        if (!blob) return null;
+        return new File([blob], shareImageFileName(), { type: "image/png" });
+      } catch (e) { return null; }
+    }
+
+    // Primary share: the phone share sheet with the picture attached and a
+    // short message (the picture shows the payouts). Falls back to a
+    // text-only share — with the full summary, since no picture rides along
+    // there — then to copying the link.
+    async function shareResults() {
+      const url = buildShareUrl();
+      const file = await getShareImageFile();
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: "Quick Skins payouts", text: shareShortMessageText(url) });
+          return;
+        } catch (e) {
+          if (e && e.name === "AbortError") return; // user closed the share sheet
+        }
+      }
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Quick Skins payouts", text: shareMessageText(url) });
+          return;
+        } catch (e) {
+          if (e && e.name === "AbortError") return;
+        }
+      }
+      copyShareLink("No share sheet on this device — link copied instead. Use Save picture below for the image.");
+    }
+
+    async function copyShareLink(copiedMsg) {
+      const url = buildShareUrl();
+      const done = () => toast(copiedMsg || "Link copied — paste it into any text or email.");
+      try {
+        await navigator.clipboard.writeText(url);
+        done();
+      } catch (e) {
+        // Older browsers / non-secure contexts: hidden textarea + execCommand.
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        let ok = false;
+        try { ok = document.execCommand("copy"); } catch (e2) { /* not supported */ }
+        ta.remove();
+        if (ok) done();
+        else toast("Couldn't copy automatically — use the Share button instead.");
+      }
+    }
+
+    function downloadShareImage() {
+      try {
+        if (!shareCanvas) shareCanvas = drawShareImage();
+        const a = document.createElement("a");
+        a.href = shareCanvas.toDataURL("image/png");
+        a.download = shareImageFileName();
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast("Payout picture saved.");
+      } catch (e) {
+        toast("Couldn't save the picture on this device.");
+      }
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Rendering
+     * ------------------------------------------------------------------ */
+    function render() {
+      const root = document.getElementById("app");
+      let body = "";
+      if (app.view === "breakdown") body = renderBreakdown();
+      else if (app.view === "payouts") body = renderPayouts();
+      else if (app.view === "share") body = renderShare();
+      else body = renderImport();
+
+      root.innerHTML = `<div class="app-shell">${renderHeader()}${body}</div>${renderPhaseNav()}`;
+      if (app.view === "share" && app.round && includedPlayers().length >= 2) updateSharePreview();
+    }
+
+    function renderHeader() {
+      const today = new Date().toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+      return `
+        <header class="app-header">
+          <div>
+            <p class="eyebrow">Disc golf skins</p>
+            <div class="title-row">
+              <h1>Quick Skins</h1>
+              ${isStandaloneApp() ? "" : `<button class="install-button" type="button" data-action="install-app">Install app</button>`}
+            </div>
+            ${isStandaloneApp() ? "" : `<a class="install-help-link" href="https://skins.spiris.app/guide.html">How to install &rarr;</a>`}
+          </div>
+          <time>${escapeHtml(today)}</time>
+        </header>`;
+    }
+
+    function renderPhaseNav() {
+      const hasRound = !!app.round;
+      const tab = (view, label, disabled) =>
+        `<button class="phase-tab${app.view === view ? " is-active" : ""}" data-action="goto" data-view="${view}" type="button"${disabled ? " disabled" : ""}>${label}</button>`;
+      return `
+        <nav class="phase-nav" aria-label="Steps">
+          <div class="phase-nav-inner">
+            ${tab("import", "1 · Import", false)}
+            ${tab("breakdown", "2 · Breakdown", !hasRound)}
+            ${tab("payouts", "3 · Payouts", !hasRound)}
+            ${tab("share", "4 · Share", !hasRound)}
+          </div>
+        </nav>`;
+    }
+
+    /* ---- Import view (step 1) ---- */
+    function renderImport() {
+      return `
+        <section class="section">
+          <p class="lead">Start with your scorecard. Export the round from UDisc as a CSV (the file ends in <strong>-UDisc.csv</strong>) and drop it in below &mdash; we'll build the skins breakdown next. Everything stays on your device.</p>
+
+          <div class="drop-zone" id="dropZone" data-action="pick-file" tabindex="0" role="button" aria-label="Choose your UDisc CSV file">
+            <strong>Tap to choose your &hellip;-UDisc.csv file</strong>
+            <span class="drop-sub">or drag &amp; drop it here</span>
+          </div>
+          <input type="file" id="csvFile" accept=".csv,text/csv" hidden>
+
+          <div class="divider-or">or paste the CSV</div>
+
+          <div class="field">
+            <label for="pasteArea">Paste UDisc CSV text</label>
+            <textarea id="pasteArea" class="paste-area" data-action="edit-paste"
+              placeholder="PlayerName,CourseName,LayoutName,...&#10;Par,...&#10;Deaner,...">${escapeHtml(app.pasteInput)}</textarea>
+          </div>
+
+          ${app.importError ? `<p class="import-error">${escapeHtml(app.importError)}</p>` : ""}
+        </section>
+
+        <div class="sticky-actions">
+          <button class="danger" type="button" data-action="clear-stored-data">Clear stored data</button>
+          <button class="primary" type="button" data-action="parse-paste" ${app.pasteInput.trim() ? "" : "disabled"}>Build skins breakdown</button>
+        </div>`;
+    }
+
+    /* ---- Breakdown view (step 2: who's in, per-hole skins, no money) ---- */
+    function renderBreakdown() {
+      if (!app.round) return renderImport();
+      const round = app.round;
+      const r = computeSkins(round);
+      const included = includedPlayers();
+      const meta = roundMeta(round);
+
+      const cardColors = playerCardColors(round);
+
+      // Who's in — remove anyone on the card who wasn't playing skins. Each row
+      // carries its player's rotating color band (is-out rows fade to muted).
+      const toggles = round.players.map(p => {
+        const out = p.included === false;
+        const sum = r.players.find(x => x.name === p.name);
+        const note = out ? "Sitting out" : (sum ? pluralize(sum.skinsWon, "skin") + " won" : "");
+        const pid = encodeURIComponent(p.name);
+        return `
+          <div class="player-row${out ? " is-out" : ""}" style="--player-color:${cardColors[p.name]}">
+            <span class="player-row-name">${escapeHtml(p.name)}</span>
+            <span class="row-note">${note}</span>
+            <button class="row-toggle" type="button" data-action="toggle-player" data-name="${pid}">${out ? "Add back" : "Remove"}</button>
+          </div>`;
+      }).join("");
+
+      const warn = included.length < 2
+        ? `<p class="import-error">Keep at least 2 players in to score a skins game.</p>`
+        : "";
+
+      const claimed = r.playedCount - r.leftoverSkins;
+
+      const cards = included.length >= 2 ? r.players.map(p => {
+        const isLeader = p.skinsWon === r.topSkins && r.topSkins > 0;
+        const colorStyle = isLeader ? "" : ` style="--card-color:${cardColors[p.name]}"`;
+        return `
+          <div class="result-card${isLeader ? " is-winner" : ""}"${colorStyle}>
+            <div class="result-top">
+              <span class="result-name">${escapeHtml(p.name)}${isLeader ? " \u{1F3C6}" : ""}</span>
+              <span class="result-net even">${pluralize(p.skinsWon, "skin")}</span>
+            </div>
+            <div class="result-stats two">
+              <div class="result-stat"><span>Skins won</span><strong>${p.skinsWon}</strong></div>
+              <div class="result-stat"><span>Holes won</span><strong>${p.holesWon}</strong></div>
+            </div>
+          </div>`;
+      }).join("") : "";
+
+      const carryNote = r.leftoverSkins > 0
+        ? `<p class="carry-note">${pluralize(r.leftoverSkins, "skin")} tied all the way to the end with no winner. Decide as a group how to settle the carryover &mdash; e.g. a closest-to-the-pin throw-off or rolling it to next time.</p>`
+        : "";
+
+      const holeRows = r.holeResults.map(h => {
+        // Order by score: the hole winner sits leftmost, then lowest score
+        // first, with anyone who didn't play the hole trailing at the end.
+        const ordered = h.scores.slice().sort((a, b) => {
+          if (a.name === h.winner) return -1;
+          if (b.name === h.winner) return 1;
+          if (a.score == null && b.score == null) return 0;
+          if (a.score == null) return 1;
+          if (b.score == null) return -1;
+          return a.score - b.score;
+        });
+        const pills = ordered.map(s => {
+          const color = cardColors[s.name];
+          const pillStyle = ` style="background:${color};color:${readableTextOn(color)}"`;
+          const isHoleWinner = h.winner && s.name === h.winner;
+          return `
+          <span class="score-pill${s.isLow && s.score != null ? " is-low" : ""}${isHoleWinner ? " is-hole-winner" : ""}"${pillStyle}>${escapeHtml(s.name)} <b>${s.score == null ? "–" : s.score}</b></span>`;
+        }).join("");
+        const outcome = h.skipped
+          ? `<span class="hole-outcome push">One player &middot; no skin</span>`
+          : h.push
+            ? `<span class="hole-outcome push">Push${h.potSkins > 1 ? ` &middot; ${pluralize(h.potSkins, "skin")} riding` : ""}</span>`
+            : `<span class="hole-outcome win">${escapeHtml(h.winner)} &middot; won ${pluralize(h.potSkins, "skin")}</span>`;
+        return `
+          <div class="hole-card${h.push || h.skipped ? " is-push" : ""}">
+            <div class="hole-card-head">
+              <span class="hole-label">Hole ${h.holeNumber}${h.par != null ? `<small>Par ${h.par}</small>` : ""}</span>
+              ${outcome}
+            </div>
+            <div class="hole-scores">${pills}</div>
+          </div>`;
+      }).join("");
+
+      return `
+        <section class="section">
+          <p class="subhead">Skins breakdown</p>
+          ${meta ? `<p class="round-meta">${meta}</p>` : ""}
+
+          <p class="subhead">Who's in the skins game?</p>
+          <p class="lead" style="margin-bottom:10px;">Remove anyone on the scorecard who wasn't part of the skins game. The skins recalculate instantly.</p>
+          <div class="player-rows">${toggles}</div>
+          ${warn}
+        </section>
+
+        ${included.length >= 2 ? `
+        <section class="section">
+          <div class="metric-grid cols-4">
+            <div class="metric"><span>Players</span><strong>${included.length}</strong></div>
+            <div class="metric"><span>Holes</span><strong>${r.playedCount}</strong></div>
+            <div class="metric"><span>Skins claimed</span><strong>${claimed}</strong></div>
+            <div class="metric"><span>Carried</span><strong>${r.leftoverSkins}</strong></div>
+          </div>
+          ${partialPresenceNote(r)}
+          ${carryNote}
+          <p class="subhead">Skins won</p>
+          <div class="player-results">${cards}</div>
+        </section>
+
+        <section class="section">
+          <button class="toggle-breakdown${app.showHoles ? " is-open" : ""}" type="button" data-action="toggle-holes">
+            <span>Hole-by-hole results</span>
+            <span class="chev" aria-hidden="true">&#9660;</span>
+          </button>
+          ${app.showHoles ? `<div class="holes-list">${holeRows}</div>` : ""}
+        </section>` : ""}
+
+        <div class="sticky-actions cols-2">
+          <button class="secondary" type="button" data-action="reimport">Import another round</button>
+          <button class="primary" type="button" data-action="goto" data-view="payouts" ${included.length < 2 ? "disabled" : ""}>Enter buy-ins &amp; payouts</button>
+        </div>`;
+    }
+
+    /* ---- Payouts view (step 3: enter buy-ins, money calculated) ---- */
+    function renderPayouts() {
+      if (!app.round) return renderImport();
+      const round = app.round;
+      const included = includedPlayers();
+      const meta = roundMeta(round);
+
+      if (included.length < 2) {
+        return `
+          <section class="section">
+            <p class="subhead">Payouts</p>
+            <p class="empty-state">Keep at least 2 players in on the breakdown step first.</p>
+          </section>
+          <div class="sticky-actions"><button class="primary" type="button" data-action="goto" data-view="breakdown">Back to breakdown</button></div>`;
+      }
+
+      const r = computeSkins(round);
+      const cardColors = playerCardColors(round);
+
+      const cards = r.players.map(p => {
+        const isWinner = p.net === r.topNet && r.topNet > 0;
+        const netClass = p.net > 0 ? "pos" : (p.net < 0 ? "neg" : "even");
+        const pid = encodeURIComponent(p.name);
+        // Same emblem band as the breakdown page; the money winner keeps the
+        // gold override (no inline color) and data-color lets refreshPayouts
+        // restore the band if the winner changes as buy-ins are edited.
+        const color = cardColors[p.name];
+        const colorStyle = isWinner ? "" : ` style="--card-color:${color}"`;
+        return `
+          <div class="result-card${isWinner ? " is-winner" : ""}" data-card="${escapeHtml(p.name)}" data-color="${color}"${colorStyle}>
+            <div class="result-top">
+              <span class="result-name" data-field="name">${escapeHtml(p.name)}${isWinner ? " \u{1F3C6}" : ""}</span>
+              <span class="result-net ${netClass}" data-field="net">${fmtSignedMoney(p.net)}</span>
+            </div>
+            <div class="result-stats">
+              <div class="result-stat"><span>Skins</span><strong>${p.skinsWon}</strong></div>
+              <div class="result-stat"><span>Won</span><strong data-field="won">${fmtMoney(p.moneyWon)}</strong></div>
+              <div class="result-stat"><span>Paid in</span><strong data-field="paidIn">${fmtMoney(p.contribution)}</strong>${r.skinSplit ? `<em class="split-note" data-field="splitNote">${p.skinSplitRefund ? `(&minus;${fmtMoney(p.skinSplitRefund)} skin split)` : ""}</em>` : ""}</div>
+            </div>
+            <div class="result-buyin">
+              <label>Buy-in per hole</label>
+              <span class="money-wrap">$
+                <input type="number" inputmode="decimal" min="0" step="1" value="${escapeHtml(p.buyIn)}"
+                  data-action="edit-round-buyin" data-name="${pid}" aria-label="Buy-in per hole for ${escapeHtml(p.name)}">
+              </span>
+            </div>
+          </div>`;
+      }).join("");
+
+      const ctpOptions = included.map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join("");
+
+      let carryNote = "";
+      if (r.leftoverSkins > 0) {
+        // Round ended on a push and hasn't been settled yet.
+        const intro = `<p class="carry-note">${pluralize(r.leftoverSkins, "skin")} (${fmtMoney(r.leftoverValue)}) carried past the last hole with no winner. Choose how to settle it.</p>`;
+        if (round.pushSettlement === "ctp") {
+          // CTP Throw-Off chosen — pick the winner who claims the carry.
+          carryNote = `
+          ${intro}
+          <div class="buyin-default" style="margin-bottom:8px;">
+            <div class="field">
+              <label for="ctpWinnerSelect">Closest-to-the-pin winner</label>
+              <select id="ctpWinnerSelect">
+                <option value="">Choose a player&hellip;</option>
+                ${ctpOptions}
+              </select>
+            </div>
+            <button class="secondary" type="button" data-action="award-ctp">Award skins</button>
+          </div>
+          <button class="text-button" type="button" data-action="clear-push-settlement" style="margin-bottom:18px;">&larr; Choose a different way to settle</button>`;
+        } else {
+          // No method picked yet — offer the two options.
+          carryNote = `
+          ${intro}
+          <div class="settlement-choice">
+            <button class="secondary" type="button" data-action="choose-settlement" data-mode="ctp">CTP Throw-Off</button>
+            <button class="secondary" type="button" data-action="choose-settlement" data-mode="split">Skin Split</button>
+          </div>`;
+        }
+      } else if (r.ctpAward) {
+        const pushSpan = r.ctpAward.startHole === r.ctpAward.endHole
+          ? `on hole ${r.ctpAward.startHole}`
+          : `starting on hole ${r.ctpAward.startHole} and running through hole ${r.ctpAward.endHole}`;
+        carryNote = `
+          <div class="carry-note">
+            <p style="margin:0 0 8px;"><strong>${escapeHtml(r.ctpAward.name)}</strong> won closest-to-the-pin and claimed ${pluralize(r.ctpAward.skins, "skin")} (${fmtMoney(r.ctpAward.value)}), from a push ${pushSpan}.</p>
+            <button class="text-button" type="button" data-action="clear-push-settlement">Undo</button>
+          </div>`;
+      } else if (r.skinSplit) {
+        carryNote = `
+          <div class="carry-note">
+            <p style="margin:0 0 8px;">Skin split: ${pluralize(r.skinSplit.skins, "skin")} (${fmtMoney(r.skinSplit.value)}) went unclaimed, so each player's buy-in for those holes was returned instead of going to a winner.</p>
+            <button class="text-button" type="button" data-action="clear-push-settlement">Undo</button>
+          </div>`;
+      }
+
+      return `
+        <section class="section">
+          <p class="subhead">Payouts</p>
+          ${meta ? `<p class="round-meta">${meta}</p>` : ""}
+
+          <p class="lead" style="margin-bottom:10px;">Set each player's buy-in <strong>per hole</strong>. Usually everyone's the same &mdash; set the default and tap Apply to all, then bump up anyone who bought in more.</p>
+          <div class="buyin-default">
+            <div class="field">
+              <label for="defaultBuyIn">Default buy-in per hole</label>
+              <span class="money-wrap" style="width:100%;">$
+                <input id="defaultBuyIn" type="number" inputmode="decimal" min="0" step="1"
+                  value="${escapeHtml(app.defaultBuyIn)}" data-action="edit-default">
+              </span>
+            </div>
+            <button class="secondary" type="button" data-action="apply-all" title="Set every player to the default">Apply to all</button>
+          </div>
+
+          <div class="metric-grid cols-4" style="margin-top:14px;">
+            <div class="metric"><span>Players</span><strong>${included.length}</strong></div>
+            <div class="metric"><span>Holes</span><strong>${r.playedCount}</strong></div>
+            <div class="metric"><span>Per hole</span><strong data-metric="perHole">${perHoleLabel(r)}</strong></div>
+            <div class="metric"><span>Total pot</span><strong data-metric="totalPot">${fmtMoney(r.totalPot)}</strong></div>
+          </div>
+
+          ${partialPresenceNote(r)}
+          ${carryNote}
+
+          <p class="subhead">Per-player payout</p>
+          <div class="player-results">${cards}</div>
+        </section>
+
+        <section class="section">
+          <p class="subhead">Payment guidance</p>
+          <p class="lead" style="margin-bottom:10px;">Recommended peer-to-peer (P2P) payments to settle up with the fewest transfers.</p>
+          <div id="paymentGuidance">${paymentGuidanceInner(r)}</div>
+          <div class="payment-apps">
+            <a class="app-link venmo" href="https://venmo.com/" target="_blank" rel="noopener noreferrer">Open Venmo</a>
+            <a class="app-link cashapp" href="https://cash.app/" target="_blank" rel="noopener noreferrer">Open Cash App</a>
+          </div>
+        </section>
+
+        <div class="sticky-actions cols-2">
+          <button class="secondary" type="button" data-action="goto" data-view="breakdown">Back to breakdown</button>
+          <button class="primary" type="button" data-action="goto" data-view="share">Share results</button>
+        </div>`;
+    }
+
+    /* ---- Share view (step 4: send the payout picture + round link) ---- */
+    function renderShare() {
+      if (!app.round) return renderImport();
+      const round = app.round;
+      const included = includedPlayers();
+      const meta = roundMeta(round);
+
+      if (included.length < 2) {
+        return `
+          <section class="section">
+            <p class="subhead">Share results</p>
+            <p class="empty-state">Keep at least 2 players in on the breakdown step first.</p>
+          </section>
+          <div class="sticky-actions"><button class="primary" type="button" data-action="goto" data-view="breakdown">Back to breakdown</button></div>`;
+      }
+
+      const url = buildShareUrl();
+      const msg = shareMessageText(url);
+      const smsHref = "sms:?&body=" + encodeURIComponent(msg);
+      const mailHref = "mailto:?subject=" + encodeURIComponent("Quick Skins payouts" + (round.courseName ? " — " + round.courseName : "")) + "&body=" + encodeURIComponent(msg);
+
+      return `
+        <section class="section">
+          <p class="subhead">Share results</p>
+          ${meta ? `<p class="round-meta">${meta}</p>` : ""}
+          <p class="lead" style="margin-bottom:10px;">Text or email the group a picture of the payouts, plus a link that opens this exact round &mdash; scores, players, and buy-ins &mdash; in Quick Skins.</p>
+
+          <div class="share-preview" id="sharePreview"><span class="share-preview-loading">Building the payout picture&hellip;</span></div>
+
+          <div class="share-actions">
+            <button class="primary" type="button" data-action="share-results">Share picture &amp; link</button>
+            <div class="share-grid">
+              <a class="share-chip" href="${escapeHtml(smsHref)}">Text the link</a>
+              <a class="share-chip" href="${escapeHtml(mailHref)}">Email the link</a>
+              <button class="secondary" type="button" data-action="copy-share-link">Copy link</button>
+              <button class="secondary" type="button" data-action="download-share-image">Save picture</button>
+            </div>
+          </div>
+          <p class="lead" style="margin:14px 0 0;">Anyone who opens the link gets the whole round &mdash; the hole-by-hole breakdown and these payouts &mdash; right on their phone. Nothing is uploaded; the round travels inside the link itself.</p>
+        </section>
+
+        <div class="sticky-actions cols-2">
+          <button class="secondary" type="button" data-action="goto" data-view="payouts">Back to payouts</button>
+          <button class="primary" type="button" data-action="reimport">Import another round</button>
+        </div>`;
+    }
+
+    // Live-update the payout figures while a buy-in changes, patching text in
+    // place instead of re-rendering. This keeps the input focused and, crucially,
+    // means action buttons aren't rebuilt mid-click (so "Apply to all" and the
+    // nav buttons work on the first tap, not the second).
+    function refreshPayouts() {
+      if (app.view !== "payouts" || !app.round) return;
+      const r = computeSkins(app.round);
+      const perHole = document.querySelector('[data-metric="perHole"]');
+      if (perHole) perHole.textContent = perHoleLabel(r);
+      const totalPot = document.querySelector('[data-metric="totalPot"]');
+      if (totalPot) totalPot.textContent = fmtMoney(r.totalPot);
+      document.querySelectorAll("[data-card]").forEach(card => {
+        const p = r.players.find(x => x.name === card.dataset.card);
+        if (!p) return;
+        const isWinner = p.net === r.topNet && r.topNet > 0;
+        card.classList.toggle("is-winner", isWinner);
+        // Winner shows the gold band (no inline var); everyone else keeps their
+        // emblem color, restored from data-color in case the winner just shifted.
+        if (isWinner) card.style.removeProperty("--card-color");
+        else card.style.setProperty("--card-color", card.dataset.color);
+        const nameEl = card.querySelector('[data-field="name"]');
+        if (nameEl) nameEl.textContent = p.name + (isWinner ? " \u{1F3C6}" : "");
+        const netEl = card.querySelector('[data-field="net"]');
+        if (netEl) {
+          netEl.textContent = fmtSignedMoney(p.net);
+          netEl.className = "result-net " + (p.net > 0 ? "pos" : p.net < 0 ? "neg" : "even");
+        }
+        const wonEl = card.querySelector('[data-field="won"]');
+        if (wonEl) wonEl.textContent = fmtMoney(p.moneyWon);
+        const paidEl = card.querySelector('[data-field="paidIn"]');
+        if (paidEl) paidEl.textContent = fmtMoney(p.contribution);
+        const splitEl = card.querySelector('[data-field="splitNote"]');
+        if (splitEl) splitEl.textContent = p.skinSplitRefund ? "(−" + fmtMoney(p.skinSplitRefund) + " skin split)" : "";
+      });
+      const guidance = document.getElementById("paymentGuidance");
+      if (guidance) guidance.innerHTML = paymentGuidanceInner(r);
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Import / ingest
+     * ------------------------------------------------------------------ */
+    function ingestRound(text) {
+      const result = parseRound(text);
+      if (result.error) { app.importError = result.error; render(); return; }
+      result.players.forEach(p => { p.included = true; p.buyIn = num(app.defaultBuyIn, 1); });
+      app.round = result;
+      app.importError = "";
+      app.showHoles = true;
+      app.view = "breakdown";
+      save();
+      render();
+      window.scrollTo(0, 0);
+      toast("Imported " + pluralize(result.players.length, "player") + " — pick who's in.");
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => ingestRound(String(e.target.result || ""));
+      reader.onerror = () => { app.importError = "Couldn't read that file."; render(); };
+      reader.readAsText(file);
+    }
+
+    function clearStoredData() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* storage may be unavailable */ }
+      if ("caches" in window) {
+        caches.open("quick-skins-shared")
+          .then(cache => cache.delete("./shared-csv-data"))
+          .catch(() => {});
+      }
+      app.view = "import";
+      app.defaultBuyIn = 1;
+      app.pasteInput = "";
+      app.importError = "";
+      app.showHoles = true;
+      app.round = null;
+      shareCanvas = null;
+      shareImageBlob = null;
+      render();
+      window.scrollTo(0, 0);
+      toast("Stored Quick Skins data cleared.");
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Event wiring (delegation)
+     * ------------------------------------------------------------------ */
+    document.addEventListener("click", e => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      const action = btn.dataset.action;
+
+      switch (action) {
+        case "goto": {
+          const view = btn.dataset.view;
+          if (view !== "import" && !app.round) { toast("Import a round first."); return; }
+          if ((view === "payouts" || view === "share") && includedPlayers().length < 2) { toast("Keep at least 2 players in first."); return; }
+          app.view = view;
+          app.importError = "";
+          save(); render(); window.scrollTo(0, 0);
+          break;
+        }
+        case "toggle-player": {
+          if (!app.round) break;
+          const name = decodeURIComponent(btn.dataset.name);
+          const p = app.round.players.find(x => x.name === name);
+          if (p) { p.included = p.included === false; save(); render(); }
+          break;
+        }
+        case "apply-all":
+          includedPlayers().forEach(p => { p.buyIn = num(app.defaultBuyIn, 1); });
+          save(); render();
+          toast("All players set to " + fmtMoney(num(app.defaultBuyIn, 1)) + " per hole.");
+          break;
+        case "pick-file":
+          document.getElementById("csvFile").click();
+          break;
+        case "parse-paste":
+          if (app.pasteInput.trim()) ingestRound(app.pasteInput);
+          break;
+        case "install-app":
+          promptInstallApp();
+          break;
+        case "clear-stored-data":
+          clearStoredData();
+          break;
+        case "toggle-holes":
+          app.showHoles = !app.showHoles;
+          render();
+          break;
+        case "choose-settlement": {
+          if (!app.round) break;
+          const mode = btn.dataset.mode; // "ctp" | "split"
+          app.round.pushSettlement = mode;
+          if (mode === "split") app.round.ctpWinner = null;
+          save(); render();
+          if (mode === "split") toast("Remaining skins split back to the players.");
+          break;
+        }
+        case "award-ctp": {
+          if (!app.round) break;
+          const sel = document.getElementById("ctpWinnerSelect");
+          const name = sel ? sel.value : "";
+          if (!name) { toast("Choose a player for the CTP win first."); break; }
+          app.round.ctpWinner = name;
+          save(); render();
+          toast(name + " claims the carryover.");
+          break;
+        }
+        case "clear-push-settlement":
+          if (!app.round) break;
+          app.round.pushSettlement = null;
+          app.round.ctpWinner = null;
+          save(); render();
+          break;
+        case "share-results":
+          shareResults();
+          break;
+        case "copy-share-link":
+          copyShareLink();
+          break;
+        case "download-share-image":
+          downloadShareImage();
+          break;
+        case "reimport":
+          app.round = null;
+          app.pasteInput = "";
+          app.importError = "";
+          app.view = "import";
+          shareCanvas = null;
+          shareImageBlob = null;
+          save(); render(); window.scrollTo(0, 0);
+          break;
+      }
+    });
+
+    // Keyboard activation for the drop zone.
+    document.addEventListener("keydown", e => {
+      if ((e.key === "Enter" || e.key === " ") && e.target.id === "dropZone") {
+        e.preventDefault();
+        document.getElementById("csvFile").click();
+      }
+    });
+
+    // Inputs (number fields, paste). Values are stored on input; figures
+    // recalculate on blur (change) so typing never loses focus.
+    document.addEventListener("input", e => {
+      const el = e.target;
+      const action = el.dataset ? el.dataset.action : null;
+      if (action === "edit-default") { app.defaultBuyIn = el.value === "" ? "" : num(el.value, 0); save(); return; }
+      if (action === "edit-paste") {
+        app.pasteInput = el.value;
+        const calcBtn = document.querySelector('[data-action="parse-paste"]');
+        if (calcBtn) calcBtn.disabled = !el.value.trim();
+        return;
+      }
+      if (action === "edit-round-buyin" && app.round) {
+        const name = decodeURIComponent(el.dataset.name);
+        const rp = app.round.players.find(x => x.name === name);
+        if (rp) { rp.buyIn = el.value === "" ? "" : num(el.value, 0); save(); refreshPayouts(); }
+        return;
+      }
+    });
+
+    document.addEventListener("change", e => {
+      const el = e.target;
+      if (el.id === "csvFile") {
+        handleFile(el.files && el.files[0]);
+        el.value = "";
+      }
+    });
+
+    // Drag & drop on the import drop zone.
+    document.addEventListener("dragover", e => {
+      const dz = e.target.closest && e.target.closest("#dropZone");
+      if (dz) { e.preventDefault(); dz.classList.add("is-dragover"); }
+    });
+    document.addEventListener("dragleave", e => {
+      const dz = e.target.closest && e.target.closest("#dropZone");
+      if (dz) dz.classList.remove("is-dragover");
+    });
+    document.addEventListener("drop", e => {
+      const dz = e.target.closest && e.target.closest("#dropZone");
+      if (!dz) return;
+      e.preventDefault();
+      dz.classList.remove("is-dragover");
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    // A CSV shared into the installed app lands here: the service worker
+    // stashed it, redirected to ?share=1, and we pick it up on load.
+    async function checkSharedFile() {
+      const params = new URLSearchParams(location.search);
+      if (!params.has("share")) return false;
+      let handled = false;
+      try {
+        const cache = await caches.open("quick-skins-shared");
+        const resp = await cache.match("./shared-csv-data");
+        if (resp) {
+          const text = await resp.text();
+          await cache.delete("./shared-csv-data");
+          if (text.trim()) { ingestRound(text); handled = true; }
+        }
+      } catch (e) { /* no cache / not installed */ }
+      history.replaceState(null, "", location.pathname);
+      if (!handled) toast("Couldn't read the shared file — try the import screen.");
+      return handled;
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Boot
+     * ------------------------------------------------------------------ */
+    load();
+    // A #r= share link overrides any saved state — the recipient should land
+    // on the shared round's breakdown, just like the original importer did.
+    const openedFromShareLink = checkSharedRoundLink();
+    render();
+    if (!openedFromShareLink) checkSharedFile();
+
+    window.addEventListener("beforeinstallprompt", e => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      render();
+      toast("Quick Skins installed.");
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

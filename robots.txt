@@ -1,0 +1,71 @@
+# Quick Skins robots.txt
+# Updated: 2026-06-30
+#
+# Policy:
+# - Allow public discovery by search engines, social preview fetchers, and AI
+#   answer/search crawlers.
+# - Keep utility endpoints, service-worker internals, and accidental CSV exports
+#   out of crawl queues.
+# - Keep render-critical assets crawlable.
+
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /manifest.webmanifest
+Disallow: /share-target
+Disallow: /shared-csv-data
+Disallow: /404.html
+Disallow: /sw.js
+Disallow: /*.csv$
+Disallow: /*.CSV$
+
+Sitemap: https://skins.spiris.app/sitemap.xml
+
+# Explicitly documented current search, AI, assistant, and preview crawlers.
+# These share the same policy as the wildcard group above.
+User-agent: Googlebot
+User-agent: Google-InspectionTool
+User-agent: GoogleOther
+User-agent: GoogleOther-Image
+User-agent: GoogleOther-Video
+User-agent: Google-Extended
+User-agent: Google-CloudVertexBot
+User-agent: Google-Agent
+User-agent: Google-NotebookLM
+User-agent: Google-Read-Aloud
+User-agent: GoogleMessages
+User-agent: Google-Site-Verification
+User-agent: FeedFetcher-Google
+User-agent: AdsBot-Google
+User-agent: AdsBot-Google-Mobile
+User-agent: Mediapartners-Google
+User-agent: bingbot
+User-agent: BingPreview
+User-agent: MicrosoftPreview
+User-agent: AdIdxBot
+User-agent: DuckDuckBot
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: OAI-SearchBot
+User-agent: OAI-AdsBot
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: CCBot
+User-agent: facebookexternalhit
+User-agent: Facebot
+User-agent: Twitterbot
+User-agent: LinkedInBot
+Allow: /
+Allow: /assets/
+Allow: /manifest.webmanifest
+Disallow: /share-target
+Disallow: /shared-csv-data
+Disallow: /404.html
+Disallow: /sw.js
+Disallow: /*.csv$
+Disallow: /*.CSV$

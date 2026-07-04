@@ -1,0 +1,64 @@
+# Quick Skins — static site, no build step.
+[build]
+  publish = "."
+  command = ""
+
+# Security headers for every response. Netlify adds none of these by default.
+# Cache-Control is deliberately NOT set here — when several rules match a path,
+# Netlify merges their headers, and duplicate Cache-Control values would clash
+# with the page-specific rules below.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# index.html and the service worker must never be cached hard, or users get
+# stuck on an old build and PWA updates won't roll out.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# The install guide is the landing page people share/link to — keep it fresh too.
+[[headers]]
+  for = "/guide.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Icons, screenshots, and demo videos use stable names for now, so keep caching
+# modest until filenames are versioned or content-hashed.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
+# NOTE: there is intentionally no rule blocking *.csv here. Netlify redirects
+# only support splats at the END of a path (extension patterns like "/*.csv"
+# silently match nothing), so the real guard is .gitignore keeping CSV exports
+# out of the deploy folder entirely. Skins data stays on-device only.
+
+# Browsers and some crawlers request /favicon.ico by default; there's no such
+# file, so quietly serve the app icon instead of a 404.
+[[redirects]]
+  from = "/favicon.ico"
+  to = "/assets/icon-192.png"
+  status = 200

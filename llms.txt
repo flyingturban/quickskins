@@ -1,0 +1,31 @@
+# Quick Skins
+
+> Quick Skins is a free disc golf skins calculator at https://skins.spiris.app/.
+> Players import a UDisc scorecard export (CSV) after their round and instantly
+> see who won each hole, how carries and pushes stacked up, and exactly what
+> everyone owes. All calculation happens on-device; no scorecard data is ever
+> uploaded. No account, no sign-up, no ads.
+
+## How it works
+
+1. Export a finished round from UDisc as a CSV (the file name ends in -UDisc.csv).
+2. Open or paste the CSV into Quick Skins and pick who was actually in the skins game.
+3. Quick Skins scores the skins game (lowest unique score wins the hole; ties push
+   and carry the skin to the next hole), then calculates buy-ins, payouts, and the
+   fewest peer-to-peer payments (e.g. Venmo, Cash App) needed to settle up.
+
+## Key facts
+
+- Free web app (PWA): installs to the home screen from the browser, no App Store.
+- Works offline on the course once installed and opened at least once.
+- Privacy: scorecard data never leaves the device.
+- Players who sat out of the skins game can be removed and results recalculate instantly.
+- Made by Spiris.
+
+## Pages
+
+- [Quick Skins app](https://skins.spiris.app/): the calculator itself (requires JavaScript).
+- [Install guide](https://skins.spiris.app/guide.html): step-by-step install for iPhone,
+  Android, and desktop, plus screenshots, demo videos, and FAQ.
+- [Source code](https://github.com/flyingturban/quickskins): public repository
+  for inspecting the app, privacy notes, deployment config, and service worker.
